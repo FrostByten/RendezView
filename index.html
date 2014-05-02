@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>RendezView</title>
+		<link rel="stylesheet" type="text/css" href="http://dev.jtsage.com/cdn/datebox/latest/jqm-datebox.min.css" />
+		<link href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.css" rel="stylesheet" />
+		<link href="http://code.jquery.com/mobile/1.4.2/jquery.mobile.structure-1.4.2.min.css" rel="stylesheet" />
+		<link href="style/buttons.css" rel="stylesheet" />
+		
+		<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+		<script type="text/javascript" src="http://dev.jtsage.com/cdn/datebox/latest/jqm-datebox.core.min.js"></script>
+	</head>
+	<body>
+	
+	
+	
+		<div id="loginPage" data-role="page">
+			<div data-role="header" data-position="fixed">
+				<h1>RendezView - Login</h1>
+			</div>
+			<div data-role="content">
+				<div style="text-align:center;">
+					<img src="images/logo.png" style="" width="350">
+				</div>
+				<div data-role="fieldcontain">
+					<label for="username">Username:</label>
+					<input type="text" name="username" id="username" value="" />
+				</div>
+				<div data-role="fieldcontain">
+					<label for="password">Password:</label>
+					<input type="password" name="password" id="password" value="" />
+				</div>
+				<fieldset class="ui-grid-a">
+					<div class="ui-block-a">
+						<a href="#registerPage" data-role="button" data-transition="flip">Register</a>
+					</div>
+					<div class="ui-block-b">
+					<a href="#mainPage" data-role="button" data-transition="flow">Login</a>
+					</div>
+			</div>
+			<div data-role="footer" data-position="fixed"></div>
+		</div>
+		
+		
+		
+		<div id="registerPage" date-role="page">
+			<div data-role="header" data-position="fixed">
+				<a href="#loginPage" data-role="button" data-transition="flip" data-direction="reverse" data-icon="back">Back</a>
+				<h1>Registration</h1>
+			</div>
+			<div data-role="content">
+				<div data-role="fieldcontain">
+					<label for="name">Name:</label>
+					<input type="text" name="name" id="name" value="John Doe" />
+				</div>
+				<div data-role="fieldcontain">
+					<label for="sid">Student ID:</label>
+					<input type="text" name="sid" id="sid" value="A00123456" />
+				</div>
+				<div data-role="fieldcontain">
+					<label for="email">BCIT Email:</label>
+					<input type="email" name="email" id="email" value="blank@bcit.ca" />
+				</div>
+				<div data-role="fieldcontain">
+					<label for="password">Password:</label>
+					<input type="password" name="password" id="password" value="" />
+				</div>
+				<div data-role="fieldcontain">
+					<label for="passconf">Confirm:</label>
+					<input type="password" name="passconf" id="passconf" value="" />
+				</div>
+				<a href="#loginPage" data-role="button" data-transition="slidedown" data-direction="reverse" data-icon="check">Submit</a>
+			</div>
+		</div>
+			
+			
+			
+		<div id="friendsPage" date-role="page">
+			<div data-role="header" data-position="fixed">
+				<a href="#mainPage" data-role="button" data-transition="slide" data-direction="reverse" data-icon="back">Back</a>
+				<h1>Friends</h1>
+				<a href="#addFriendPage" data-role="button" data-rel="dialog" data-transition="pop" data-icon="plus">Add</a>
+			</div>
+			<div data-role="content">
+				<div data-role="fieldcontain">
+					<form class="ui-filterable">
+						<input data-type="search" name="friendsFilter" id="friendsFilter" />
+					</form>
+				</div>
+				<ul id="friendsList" data-role="listview" data-filter="true" data-input="#friendsFilter">
+					<li>Friend 1</li>
+					<li>Friend 2</li>
+				</ul>
+			</div>
+			<div data-role="footer" data-position-"fixed"></div>
+		</div>
+		
+		
+		
+		<div id="mainPage" date-role="page">
+			<div data-role="header" data-position="fixed">
+				<h1>RendezView</h1>
+			</div>
+			<div data-role="content">
+				<div style="text-align:center;">
+					<img src="images/logo.png" style="" width="350">
+				</div>
+				<fieldset class="ui-grid-a">
+					<div class="ui-block-a">
+						<a href="#updatePage" data-role="button" class="update-btn" data-transition="slide">Update</a>
+						<a href="#schedulePage" data-role="button" class="schedule-btn" data-transition="slide">Schedule</a>
+					</div>
+					<div class="ui-block-b">
+						<a href="#friendsPage" data-role="button" class="friends-btn" data-transition="slide">Friends</a>
+						<a href="#loginPage" data-role="button" class="logout-btn" data-transition="flow" data-direction="reverse">Logout</a>
+					</div>
+				</fieldset>
+			</div>
+			<div data-role="footer" data-position-"fixed"></div>
+		</div>
+		
+		
+		
+		<div id="updatePage" date-role="page">
+			<div data-role="header" data-position="fixed">
+				<a href="#mainPage" data-role="button" data-transition="slide" data-direction="reverse" data-icon="back">Back</a>
+				<h1>Update</h1>
+				<a href="#mainPage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="check">Commit</a>
+			</div>
+			<div data-role="content">
+				<div id="inset" name="inset" style="background-color:#E9E9E9;border-style:ridge;border-color:#CACACA;border-width:3px;padding:15px;">
+					<div class="ui-grid-a">
+						<div class="ui-block-a">
+							<label>Current location: </label>
+							<strong>Lorum ipsum dolar sit amet</strong>
+						</div>
+						<div class="ui-block-b">
+							<label>Until: </label>
+							<strong>Lorum ipsum dolar sit amet</strong>
+						</div>
+					</div>
+				</div>
+				<br />
+				<label for="location">New Location:</label>
+				<div class="ui-grid-a">
+					<div class="ui-block-a">
+						<select name="location" id="location">
+							<option value="1">Building 1</option>
+							<option value="2">Building 2</option>
+							<option value="3">Building 3</option>
+						</select>
+					</div>
+					<div class="ui-block-b">
+						<select name="location" id="location">
+							<option value="1">Room 1</option>
+							<option value="2">Room 2</option>
+							<option value="3">Room 3</option>
+						</select>
+					</div>
+				</div>
+				<label>Until:</label>
+				<strong>Time selector here</strong>
+				
+			</div>
+			<div data-role="footer" data-position-"fixed"></div>
+		</div>
+		
+		
+		
+		<div id="schedulePage" date-role="page">
+			<div data-role="header" data-position="fixed">
+				<a href="#mainPage" data-role="button" data-transition="slide" data-direction="reverse" data-icon="back">Back</a>
+				<h1>Schedule</h1>
+				<a href="#addSchedulePage" data-role="button" data-rel="dialog" data-transition="pop" data-icon="plus">Add</a>
+			</div>
+			<div data-role="content">
+				<div data-role="fieldcontain">
+					<form class="ui-filterable">
+						<input data-type="search" name="scheduleFilter" id="scheduleFilter" />
+					</form>
+				</div>
+				<ul id="scheduleList" data-role="listview" data-filter="true" data-input="#scheduleFilter">
+					<li>Schedule 1</li>
+					<li>Schedule 2</li>
+				</ul>
+			</div>
+		</div>
+		
+		
+		
+		<div id="addSchedulePage" date-role="page">
+			<div data-role="header" data-position="fixed">
+				<a href="#schedulePage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="back">Back</a>
+				<h1>Add Scheduled Event</h1>
+				<a href="#schedulePage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="check">Confirm</a>
+			</div>
+			<div data-role="content">
+				<label>Every:</label>
+				
+				<label>From:</label>
+				
+				<label>To:</label>
+				
+				<label>Location:</label>
+			</div>
+		</div>
+		
+		
+		
+		<div id="addFriendPage" date-role="page">
+			<div data-role="header" data-position="fixed">
+				<a href="#friendsPage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="back">Back</a>
+				<h1>Add Friend</h1>
+				<a href="#friendsPage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="check">Confirm</a>
+			</div>
+			<div data-role="content">
+				<div data-role="fieldcontain">
+					<label for="searchsid"> Enter Student ID:</label>
+					<input type="text" name="searchsid" id="searchsid" value="A00123456" />
+				</div>
+			</div>
+		</div>
+		
+		
+
+	</body>
+</html>
