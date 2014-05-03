@@ -4,23 +4,3 @@
     width: 100% !important;
     background-position: center  !important; 
 }
-
-.update-btn {
-	background-repeat: no-repeat !important;
-	background-image: url('http://shop.ascd.org/images/red-error.gif') !important;
-}
-
-.friends-btn {
-	background-repeat: no-repeat !important;
-	background-image: url('http://shop.ascd.org/images/red-error.gif') !important;
-}
-
-.schedule-btn {
-	background-repeat: no-repeat !important;
-	background-image: url('http://shop.ascd.org/images/red-error.gif') !important;
-}
-
-.logout-btn {
-	background-repeat: no-repeat !important;
-	background-image: url('http://shop.ascd.org/images/red-error.gif') !important;
-}
