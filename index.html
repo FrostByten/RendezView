@@ -4,14 +4,15 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>RendezView</title>
-		<link rel="stylesheet" type="text/css" href="http://dev.jtsage.com/cdn/datebox/latest/jqm-datebox.min.css" />
+		
 		<link href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.css" rel="stylesheet" />
 		<link href="http://code.jquery.com/mobile/1.4.2/jquery.mobile.structure-1.4.2.min.css" rel="stylesheet" />
 		<link href="style/buttons.css" rel="stylesheet" />
+		<link href="style/themes/group23.css" rel="stylesheet" />
+		<link href="style/themes/jquery.mobile.icons.min.css" rel="stylesheet" />
 		
 		<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 		<script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
-		<script type="text/javascript" src="http://dev.jtsage.com/cdn/datebox/latest/jqm-datebox.core.min.js"></script>
 	</head>
 	<body>
 	
@@ -23,7 +24,7 @@
 			</div>
 			<div data-role="content">
 				<div style="text-align:center;">
-					<img src="images/logo.png" style="" width="87%">
+					<img src="images/logo.png" style="" width="96%">
 				</div>
 				<div data-role="fieldcontain">
 					<label for="username">Username:</label>
@@ -46,7 +47,7 @@
 		
 		
 		
-		<div id="registerPage" date-role="page">
+		<div id="registerPage" data-role="page">
 			<div data-role="header" data-position="fixed">
 				<a href="#loginPage" data-role="button" data-transition="flip" data-direction="reverse" data-icon="back">Back</a>
 				<h1>Registration</h1>
@@ -78,7 +79,7 @@
 			
 			
 			
-		<div id="friendsPage" date-role="page">
+		<div id="friendsPage" data-role="page">
 			<div data-role="header" data-position="fixed">
 				<a href="#mainPage" data-role="button" data-transition="slide" data-direction="reverse" data-icon="back">Back</a>
 				<h1>Friends</h1>
@@ -106,13 +107,13 @@
 		
 		
 		
-		<div id="mainPage" date-role="page">
+		<div id="mainPage" data-role="page">
 			<div data-role="header" data-position="fixed">
 				<h1>RendezView</h1>
 			</div>
 			<div data-role="content">
 				<div style="text-align:center;">
-					<img src="images/logo.png" style="" width="87%">
+					<img src="images/logo.png" style="" width="96%">
 				</div>
 				<fieldset class="ui-grid-a">
 					<div class="ui-block-a">
@@ -142,14 +143,14 @@
 		
 		
 		
-		<div id="updatePage" date-role="page">
+		<div id="updatePage" data-role="page">
 			<div data-role="header" data-position="fixed">
 				<a href="#mainPage" data-role="button" data-transition="slide" data-direction="reverse" data-icon="back">Back</a>
 				<h1>Update</h1>
 				<a href="#mainPage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="check">Commit</a>
 			</div>
 			<div data-role="content">
-				<div id="inset" name="inset" style="background-color:#E9E9E9;border-style:ridge;border-color:#CACACA;border-width:3px;padding:15px;">
+				<div id="inset" name="inset" style="background-color:#4B4B4B;border-style:ridge;border-color:#6B6B6B;border-width:3px;padding:15px;">
 					<div class="ui-grid-a">
 						<div class="ui-block-a" style="padding:5px;">
 							<label>Current location: </label>
@@ -227,7 +228,7 @@
 		
 		
 		
-		<div id="schedulePage" date-role="page">
+		<div id="schedulePage" data-role="page">
 			<div data-role="header" data-position="fixed">
 				<a href="#mainPage" data-role="button" data-transition="slide" data-direction="reverse" data-icon="back">Back</a>
 				<h1>Schedule</h1>
@@ -254,7 +255,7 @@
 		
 		
 		
-		<div id="addSchedulePage" date-role="page">
+		<div id="addSchedulePage" data-role="page">
 			<div data-role="header" data-position="fixed">
 				<a href="#schedulePage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="back">Back</a>
 				<h1>Add Scheduled Event</h1>
@@ -380,7 +381,7 @@
 		
 		
 		
-		<div id="addFriendPage" date-role="page">
+		<div id="addFriendPage" data-role="page">
 			<div data-role="header" data-position="fixed">
 				<a href="#friendsPage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="back">Back</a>
 				<h1>Add Friend</h1>
@@ -394,7 +395,7 @@
 		
 		
 
-		<div id="settingFriendPage" date-role="page">
+		<div id="settingFriendPage" data-role="page">
 			<div data-role="content">
 				<a href="#friendsPage" data-role="button" data-theme="b">Delete</a>
 				<a href="#friendsPage" data-role="button">Cancel</a>
@@ -403,7 +404,7 @@
 		
 		
 		
-		<div id="settingSchedulePage" date-role="page">
+		<div id="settingSchedulePage" data-role="page">
 			<div data-role="content">
 				<a href="#schedulePage" data-role="button" data-theme="b">Delete</a>
 				<a href="#schedulePage" data-role="button">Cancel</a>
