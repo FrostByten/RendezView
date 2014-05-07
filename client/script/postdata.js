@@ -31,6 +31,12 @@ function tryLogin()
 		pass = document.getElementById("passwordlog").value,
 		query = user + "/" + pass + "/login?";
 		
+	if(user==""||pass=="")
+	{
+		window.location.replace("#loginIncorrect");
+		return;
+	}
+		
 	window.location.replace(query);
 }
 
@@ -46,6 +52,11 @@ function sendReg()
 		
 	if(password!=document.getElementById("passconf").value)
 		window.location.replace("#noConfirm");
+	if(firstname==""||lastname==""||sid==""||password==""||email=="")
+	{
+		window.location.replace("#noReg");
+		return;
+	}
 	else
 	{
 		window.location.replace(query);

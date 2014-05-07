@@ -114,16 +114,23 @@ function validate(pathname, response)
 	console.log("\n\nVALIDATE request received\n");
 	
 	var name = pathname.split("/")[1],
-		row = query("SELECT * FROM users WHERE userid=\"" + name + "\"", 0);
+		row = query("SELECT * FROM users WHERE userid = \"" + name + "\"", 0);
 	
 	if(row==null)
+	{
 		write404(response);
+		console.log("Validation denied... No such user: " + name);
+	}
 	else
 	{
-		if(row[0].validated==1)
+		if(row.validated==1)
+		{
 			write404(response);
+			console.log("Validation denied... User already validated: " + name);
+		}
 		else
 		{
+			console.log("Validation approved... Updating database");
 			query("UPDATE users SET validated = 1 WHERE userid = \"" + name + "\";", 0);
 			response.writeHead(200, {"Content-Type": "text/plain"});
 			response.write("Email validated.\n You may now log on with your username.");
@@ -139,19 +146,19 @@ function tryLogin(pathname, response)
 		
 	if(status==0)
 	{
-	
-	}
+		console.log("Login approved... User: " + list[1]);
 		//success, assign id, allow access
+	}
 	if(status==1|status==2)
 	{
-	
-	}
+		console.log("Login denied... Wrong username/password, User: " + list[1]);
 		//failure, wrong username/password
+	}
 	if(status==3)
 	{
-	
-	}
+		console.log("Login denied... User not validated: " + list[1]);
 		//failure, not validated
+	}
 }
 
 function checkLogin(username, password)
@@ -183,11 +190,12 @@ function tryRegister(pathname, response)
 	
 	if(row!=null)
 	{
-	
-	}
+		console.log("Registration denied... User already exists: " + sid);
 		//failure: user already exists
+	}
 	else
 	{
+		console.log("Registration approved... Updating database");
 		query("INSERT INTO users VALUES (\"" + sid + "\", \"" + lastname + "\", \"" + email + "\", \"" + password + "\", 0);", 0);
 		//success: notify client
 	}
@@ -195,7 +203,15 @@ function tryRegister(pathname, response)
 
 function query(input, row)
 {
-	var value;
+	var value = {
+		userID: "null",
+		lastName: "null",
+		firstName: "null",
+		email: "null",
+		password: "null",
+		validated: 0
+	};
+	
 	var connection = db.createConnection({
 		host : '162.156.5.173',
 		user : 'admin',
@@ -211,7 +227,18 @@ function query(input, row)
 	connection.query("use rendezview");
 	connection.query(input, function(err, rows, fields)
 	{
-		value = rows[row];
+		if(rows[row]==null)
+		{
+			value = null;
+			return;
+		}
+		
+		value.userid = rows[row].userid;
+		value.lastName = rows[row].lastName;
+		value.firstName = rows[row].firstName;
+		value.email = rows[row].email;
+		value.password = rows[row].password;
+		value.validated = rows[row].validated;
 	});
 	connection.end();
 	
