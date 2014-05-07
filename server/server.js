@@ -114,9 +114,9 @@ function validate(pathname, response)
 	console.log("\n\nVALIDATE request received\n");
 	
 	var name = pathname.split("/")[1],
-		row = query("SELECT * FROM users WHERE userid=\"" + name + "\"");
+		row = query("SELECT * FROM users WHERE userid=\"" + name + "\"", 0);
 	
-	if(row[0]==null)
+	if(row==null)
 		write404(response);
 	else
 	{
@@ -124,7 +124,7 @@ function validate(pathname, response)
 			write404(response);
 		else
 		{
-			query("UPDATE users SET validated = 1 WHERE userid = \"" + name + "\";");
+			query("UPDATE users SET validated = 1 WHERE userid = \"" + name + "\";", 0);
 			response.writeHead(200, {"Content-Type": "text/plain"});
 			response.write("Email validated.\n You may now log on with your username.");
 			response.end();
@@ -138,24 +138,33 @@ function tryLogin(pathname, response)
 		status = checkLogin(list[1], list[2]);
 		
 	if(status==0)
+	{
+	
+	}
 		//success, assign id, allow access
-	else if(status==1|status==2)
+	if(status==1|status==2)
+	{
+	
+	}
 		//failure, wrong username/password
-	else if(status==3)
+	if(status==3)
+	{
+	
+	}
 		//failure, not validated
 }
 
 function checkLogin(username, password)
 {
-	var rows = query("SELECT * FROM users WHERE userID=\"" + username + "\"");
+	var row = query("SELECT * FROM users WHERE userID=\"" + username + "\"", 0);
 
 	console.log("\n\nLOGIN request received\n");
 	
-	if(rows[0]==null)
+	if(row==null)
 		return 1; //wrong username
-	if(rows[0].password!=password)
+	if(row.password!=password)
 		return 2; //wrong password
-	if(!rows[0].validated)
+	if(!row.validated)
 		return 3; //not validated
 	return 0; //success
 }
@@ -168,20 +177,23 @@ function tryRegister(pathname, response)
 		sid = data[3],
 		email = data[4],
 		password = data[5],
-		rows = query("SELECT * FROM users WHERE userID=\"" + sid + "\"");
+		row = query("SELECT * FROM users WHERE userID=\"" + sid + "\"", 0);
 		
 	console.log("\n\nREGISTER request received\n");	
 	
-	if(rows[0]!=null)
+	if(row!=null)
+	{
+	
+	}
 		//failure: user already exists
 	else
 	{
-		query("INSERT INTO users VALUES (\"" + sid + "\", \"" + lastname + "\", \"" + email + "\", \"" + password + "\", 0);");
+		query("INSERT INTO users VALUES (\"" + sid + "\", \"" + lastname + "\", \"" + email + "\", \"" + password + "\", 0);", 0);
 		//success: notify client
 	}
 }
 
-function query(input)
+function query(input, row)
 {
 	var value;
 	var connection = db.createConnection({
@@ -199,7 +211,7 @@ function query(input)
 	connection.query("use rendezview");
 	connection.query(input, function(err, rows, fields)
 	{
-		value = rows;
+		value = rows[row];
 	});
 	connection.end();
 	
