@@ -62,6 +62,11 @@ function serve(request, response)
 		tryLogin(pathname, response);
 		return;
 	}
+	if(pathname.search("register?")!=-1)
+	{
+		tryRegister(pathname, response);
+		return;
+	}
 	
 	fs.exists(filename, function(exists)
 	{
@@ -112,14 +117,14 @@ function validate(pathname, response)
 		row = query("SELECT * FROM users WHERE userid=\"" + name + "\"");
 	
 	if(row[0]==null)
-		//failure, no user exists
+		write404(response);
 	else
 	{
 		if(row[0].validated==1)
-			//failure, already validated
+			write404(response);
 		else
 		{
-			//success, validate user
+			query("UPDATE users SET validated = 1 WHERE userid = \"" + name + "\";");
 			response.writeHead(200, {"Content-Type": "text/plain"});
 			response.write("Email validated.\n You may now log on with your username.");
 			response.end();
@@ -144,8 +149,8 @@ function checkLogin(username, password)
 {
 	var rows = query("SELECT * FROM users WHERE userID=\"" + username + "\"");
 
-	if(err)
-		console.log("Query failed");
+	console.log("\n\nLOGIN request received\n");
+	
 	if(rows[0]==null)
 		return 1; //wrong username
 	if(rows[0].password!=password)
@@ -153,6 +158,27 @@ function checkLogin(username, password)
 	if(!rows[0].validated)
 		return 3; //not validated
 	return 0; //success
+}
+
+function tryRegister(pathname, response)
+{
+	var data = pathname.split("/"),
+		firstname = data[1],
+		lastname = data[2],
+		sid = data[3],
+		email = data[4],
+		password = data[5],
+		rows = query("SELECT * FROM users WHERE userID=\"" + sid + "\"");
+		
+	console.log("\n\nREGISTER request received\n");	
+	
+	if(rows[0]!=null)
+		//failure: user already exists
+	else
+	{
+		query("INSERT INTO users VALUES (\"" + sid + "\", \"" + lastname + "\", \"" + email + "\", \"" + password + "\", 0);");
+		//success: notify client
+	}
 }
 
 function query(input)
