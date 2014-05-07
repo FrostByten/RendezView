@@ -3,7 +3,8 @@ var http = require('http'),
 	url = require('url'),
 	path = require('path'),
 	qs = require('querystring'),
-	fs = require('fs');
+	fs = require('fs'),
+	db = require('mysql');
 	
 //----------------Global Vars--------------
 var httpport = 80,
@@ -56,6 +57,11 @@ function serve(request, response)
 		validate(pathname, response);
 		return;
 	}
+	if(pathname.search("login?")!=-1)
+	{
+		tryLogin(pathname, response);
+		return;
+	}
 	
 	fs.exists(filename, function(exists)
 	{
@@ -100,8 +106,76 @@ function writeFile(file, response)
 
 function validate(pathname, response)
 {
-	console.log("\n\nVALIDATE request recieved\n");
-	response.writeHead(200, {"Content-Type": "text/plain"});
-	response.write("Email validated.\n You may now log on with your username.");
-	response.end();
+	console.log("\n\nVALIDATE request received\n");
+	
+	var name = pathname.split("/")[1],
+		row = query("SELECT * FROM users WHERE userid=\"" + name + "\"");
+	
+	if(row[0]==null)
+		//failure, no user exists
+	else
+	{
+		if(row[0].validated==1)
+			//failure, already validated
+		else
+		{
+			//success, validate user
+			response.writeHead(200, {"Content-Type": "text/plain"});
+			response.write("Email validated.\n You may now log on with your username.");
+			response.end();
+		}
+	}
+}
+
+function tryLogin(pathname, response)
+{
+	var list = pathname.split("/"),
+		status = checkLogin(list[1], list[2]);
+		
+	if(status==0)
+		//success, assign id, allow access
+	else if(status==1|status==2)
+		//failure, wrong username/password
+	else if(status==3)
+		//failure, not validated
+}
+
+function checkLogin(username, password)
+{
+	var rows = query("SELECT * FROM users WHERE userID=\"" + username + "\"");
+
+	if(err)
+		console.log("Query failed");
+	if(rows[0]==null)
+		return 1; //wrong username
+	if(rows[0].password!=password)
+		return 2; //wrong password
+	if(!rows[0].validated)
+		return 3; //not validated
+	return 0; //success
+}
+
+function query(input)
+{
+	var value;
+	var connection = db.createConnection({
+		host : '162.156.5.173',
+		user : 'admin',
+		password : 'hype41',
+	});
+	
+	connection.connect(function(err)
+	{
+		if(err)
+			console.log("SQL Error on: " + input);
+	});
+	
+	connection.query("use rendezview");
+	connection.query(input, function(err, rows, fields)
+	{
+		value = rows;
+	});
+	connection.end();
+	
+	return value;
 }

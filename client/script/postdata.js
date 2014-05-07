@@ -1,4 +1,4 @@
-function sendReg()
+function JSONTest()
 {
 	$.ajax(
 	{
@@ -25,9 +25,37 @@ function sendReg()
 	window.location.replace("#regConfirmPage");
 }
 
-function resend()
+function tryLogin()
 {
-	
+	var user = document.getElementById("username").value,
+		pass = document.getElementById("passwordlog").value,
+		query = user + "/" + pass + "/login?";
+		
+	window.location.replace(query);
+}
+
+function sendReg()
+{
+	var name = document.getElementById("name").value,
+		sid = document.getElementById("sid").value,
+		email = document.getElementById("email").value,
+		password = document.getElementById("password").value,
+		firstname = name.split(" ")[0],
+		lastname = name.split(" ")[1],
+		query = firstname + "/" + lastname + "/" + sid + "/" + email + "/" + password + "/register?";
+		
+	if(password!=document.getElementById("passconf").value)
+		window.location.replace("#noConfirm");
+	else
+	{
+		window.location.replace(query);
+		window.location.replace("#regConfirmPage");
+	}
+}
+
+function resendEmail()
+{
+	//tell server to resend email
 	window.location.replace("#loginPage");
 }
 

@@ -35,14 +35,14 @@
 				</div>
 				<div data-role="fieldcontain">
 					<label for="password">Password:</label>
-					<input type="password" name="password" id="password" value="" />
+					<input type="password" name="passwordlog" id="passwordlog" value="" />
 				</div>
 				<fieldset class="ui-grid-a">
 					<div class="ui-block-a">
 						<a href="#registerPage" data-role="button" data-transition="flip">Register</a>
 					</div>
 					<div class="ui-block-b">
-					<a href="#mainPage" data-role="button" data-transition="flow">Login</a>
+					<a href="javascript:tryLogin()" data-role="button" data-transition="flow">Login</a>
 					</div>
 			</div>
 			<div data-role="footer" data-position="fixed"></div>
@@ -436,7 +436,7 @@
 				Please follow the link in the email to confirm activation.<br />
 				<br />
 				If you did not receive the email, click the button below.</strong><br />
-				<a href="javascript:resend()" data-role="button" data-theme="b">Re-send email</a>
+				<a href="javascript:resendEmail()" data-role="button" data-theme="b">Re-send email</a>
 				<a href="#loginPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
 			</div>
 		</div>
@@ -451,5 +451,17 @@
 				<a href="#loginPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
 			</div>
 		</div>
+		
+		
+		
+		<div id="noConfirm" data-role="page">
+			<div data-role="content">
+				<strong><h1>Password Incorrect</h1><br />
+				password and password confirm fields do not match!
+				</strong><br />
+				<a href="#registerPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+			</div>
+		</div>
+		
 	</body>
 </html>
