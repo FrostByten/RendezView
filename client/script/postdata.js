@@ -1,3 +1,26 @@
+var socket = io.connect('http://162.156.5.173:84');
+var usersid = "";
+
+socket.on('noreg', function(data)
+{
+	noRegWindow();
+});
+
+socket.on('logincorrect', function(data)
+{
+	correctLogin();
+});
+
+socket.on('loginincorrect', function(data)
+{
+	incorrectLogin();
+});
+
+socket.on('loginnotverified', function(data)
+{
+	loginNotVerified();
+});
+
 function JSONTest()
 {
 	$.ajax(
@@ -25,6 +48,11 @@ function JSONTest()
 	window.location.replace("#regConfirmPage");
 }
 
+function noRegWindow()
+{
+	window.location.replace("#noReg");
+}
+
 function tryLogin()
 {
 	var user = document.getElementById("username").value,
@@ -36,7 +64,7 @@ function tryLogin()
 		window.location.replace("#loginIncorrect");
 		return;
 	}
-		
+	usersid = user;
 	window.location.replace(query);
 }
 
@@ -50,7 +78,7 @@ function sendReg()
 		lastname = name.split(" ")[1],
 		query = firstname + "/" + lastname + "/" + sid + "/" + email + "/" + password + "/register?";
 		
-	if(password!=document.getElementById("passconf").value)
+	if(document.getElementById("password").value!=document.getElementById("passconf").value)
 		window.location.replace("#noConfirm");
 	if(firstname==""||lastname==""||sid==""||password==""||email=="")
 	{
@@ -66,8 +94,13 @@ function sendReg()
 
 function resendEmail()
 {
-	//tell server to resend email
+	window.location.replace(usersid + "/mail?");
 	window.location.replace("#loginPage");
+}
+
+function loginNotVerified()
+{
+	window.location.replace("#loginNotVerified");
 }
 
 function incorrectLogin()
@@ -78,4 +111,6 @@ function incorrectLogin()
 function correctLogin()
 {
 	document.getElementById("incorrecttext").style.display = 'none';
+	usersid = document.getElementById("username").value;
+	alert(usersid);
 }

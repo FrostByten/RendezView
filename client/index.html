@@ -14,6 +14,7 @@
 		<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 		<script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
 		
+		<script src="script/socketio/socket.io.js"></script>
 		<script src="script/postdata.js"></script>
 	</head>
 	<body>
@@ -67,7 +68,7 @@
 				<div data-role="fieldcontain">
 					<label for="email">Email:</label>
 					<input type="email" name="email" id="email" value="" />
-					<label for="email">@bcit.ca</label>
+					<label for="email">@my.bcit.ca</label>
 				</div>
 				<div data-role="fieldcontain">
 					<label for="password">Password:</label>
@@ -471,6 +472,16 @@
 				Sorry, that registration information is invalid, please try again.
 				</strong><br />
 				<a href="#registerPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+			</div>
+		</div>
+		
+		
+		<div id="emailValidated" data-role="page">
+			<div data-role="content">
+				<strong><h1>Email Validated</h1><br />
+				Your account has been validated, you may now log in.
+				</strong><br />
+				<a href="#loginPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
 			</div>
 		</div>
 		
