@@ -166,15 +166,16 @@ function validate(pathname, response)
 			console.log("SQL Error: " + err);
 			return;
 		}
-		var row = rows[0];
 		
-		if(row==null||row.userID=='null')
+		
+		if(rows==null|rows==undefined)
 		{
 			write404(response);
 			console.log("Validation denied... No such user: " + name);
 		}
 		else
 		{
+			var row = rows[0];
 			if(row.validated==1)
 			{
 				write404(response);
@@ -202,9 +203,7 @@ function tryLogin(pathname, response)
 		if(err)
 			console.log("SQL ERROR: " + err);
 		
-		var row = rows[0];
-		
-		if(row.userID=='null'||row.userID==null)
+		if(rows==null||rows==undefined)
 		{
 			console.log("Login denied... No such user: " + list[1]);
 			response.writeHead(200, {"Content-Type": "text/html"});
@@ -212,6 +211,8 @@ function tryLogin(pathname, response)
 			response.end();
 			return;
 		}
+		
+		var row = rows[0];
 		if(row.password!=list[2])
 		{
 			console.log("Login denied... Incorrect password: " + list[2]);
@@ -248,7 +249,7 @@ function tryRegister(pathname, response)
 	
 	connection.query("SELECT * FROM users WHERE userID=\"" + sid + "\"", function(err, rows, fields)
 	{
-		if(rows!=undefined)
+		if(rows!=null&&rows!=undefined)
 		{
 			console.log("Registration denied... User already exists: " + sid);
 			response.writeHead(200, {"Content-Type": "text/html"});

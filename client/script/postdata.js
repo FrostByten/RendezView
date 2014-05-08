@@ -114,3 +114,9 @@ function correctLogin()
 	usersid = document.getElementById("username").value;
 	alert(usersid);
 }
+
+function logout()
+{
+	window.location.replace("#loginPage");
+	usersid = "";
+}
