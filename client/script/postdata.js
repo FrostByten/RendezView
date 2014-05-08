@@ -106,6 +106,7 @@ function loginNotVerified()
 function incorrectLogin()
 {
 	document.getElementById("incorrecttext").style.display = 'block';
+    alert("here");
 }
 
 function correctLogin()

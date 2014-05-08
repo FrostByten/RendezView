@@ -9,10 +9,10 @@ var http = require('http'),
 	nodemailer = require('nodemailer');
 	
 //----------------Global Vars--------------
-var httpport = 80,
+var httpport = 84,
 	sqlport = 3306,
 	connection = db.createConnection({
-		host : '162.156.5.173',
+		host : 'localhost',
 		user : 'admin',
 		password : 'hype41',
 	});
@@ -43,8 +43,6 @@ function parseJSON(request, response)
 {
 	var data = "";
 	
-	console.log("POST Request received from: " + request.connection.remoteAddress);
-	
 	request.on("data", function(chunk)
 	{
 		data += chunk;
@@ -62,7 +60,6 @@ function parseJSON(request, response)
 
 function serve(request, response)
 {
-	console.log("GET Request received from: " + request.connection.remoteAddress + " for " + request.url);
 	
 	//parse the path from the url and append it to the current working directory
 	var pathname = url.parse(request.url).pathname,
@@ -127,7 +124,8 @@ function makeValid(name, response)
 {
 	connection.query("UPDATE users SET validated=1 WHERE userID = \"" + name + "\"");
 	response.writeHead(200, {"Content-Type": "text/html"});
-	response.write("<script>window.location.replace(\"../../index.html#emailValidated\");</script>");
+	
+    response.write("<script>window.location.replace(\"../../../index.html#emailValidated\");</script>");
 	response.end();
 }
 
@@ -154,7 +152,6 @@ function writeFile(file, response)
 
 function validate(pathname, response)
 {
-	console.log("\n\nVALIDATE request received\n");
 	
 	var name = pathname.split("/")[1];
 	
@@ -171,20 +168,17 @@ function validate(pathname, response)
 		if(row==null||row.userID=='null')
 		{
 			write404(response);
-			console.log("Validation denied... No such user: " + name);
 		}
 		else
 		{
 			if(row.validated==1)
 			{
 				write404(response);
-				console.log("Validation denied... User already validated: " + name);
 			}
 			else
 			{
-				console.log("Validation approved... Updating database");
 				response.writeHead(200, {"Content-Type": "text/html"});
-				response.write("<script>window.location.replace(\"localhost/" + name + "/makevalid?\");</script>");
+				response.write("<script>window.location.replace(\"162.156.5.173/" + name + "/makevalid?\");</script>");
 				response.end();
 			}
 		}
@@ -195,26 +189,32 @@ function tryLogin(pathname, response)
 {
 	var list = pathname.split("/");
 		
-	console.log("\n\nLOGIN request received\n");
 	connection.query("use rendezview");
 	connection.query("SELECT * FROM users WHERE userID=\"" + list[1] + "\"", function(err, rows, fields)
 	{
 		if(err)
 			console.log("SQL ERROR: " + err);
 		
-		var row = rows[0];
-		
-		if(row.userID=='null'||row.userID==null)
+		if(rows == null || rows == undefined)
 		{
-			console.log("Login denied... No such user: " + list[1]);
 			response.writeHead(200, {"Content-Type": "text/html"});
 			response.write("<script>window.location.replace(\"../../../index.html#loginIncorrect\");</script>");
 			response.end();
 			return;
 		}
+        
+        var row = rows[0];
+        
+        if(row == null || row == undefined)
+        {
+            response.writeHead(200, {"Content-Type": "text/html"});
+			response.write("<script>window.location.replace(\"../../../index.html#loginIncorrect\");</script>");
+			response.end();
+			return;
+        }
+        
 		if(row.password!=list[2])
 		{
-			console.log("Login denied... Incorrect password: " + list[2]);
 			response.writeHead(200, {"Content-Type": "text/html"});
 			response.write("<script>window.location.replace(\"../../../index.html#loginIncorrect\");</script>");
 			response.end();
@@ -222,13 +222,12 @@ function tryLogin(pathname, response)
 		}
 		if(!row.validated)
 		{
-			console.log("Login denied... User not validated: " + list[1]);
 			response.writeHead(200, {"Content-Type": "text/html"});
 			response.write("<script>window.location.replace(\"../../../index.html#loginNotVerified\");</script>");
 			response.end();
 			return;
 		}
-		console.log("Login approved... User: " + list[1]);
+
 		response.writeHead(200, {"Content-Type": "text/html"});
 		response.write("<script>window.location.replace(\"../../../index.html#mainPage\");</script>");
 		response.end();
@@ -244,22 +243,18 @@ function tryRegister(pathname, response)
 		email = data[4],
 		password = data[5];
 	
-	console.log("\n\nREGISTER request received\n");	
-	
 	connection.query("SELECT * FROM users WHERE userID=\"" + sid + "\"", function(err, rows, fields)
 	{
 		if(rows!=undefined)
 		{
-			console.log("Registration denied... User already exists: " + sid);
 			response.writeHead(200, {"Content-Type": "text/html"});
 			response.write("<script>window.location.replace(\"../../../../../../index.html#noReg\");</script>");
 			response.end();
 		}
 		else
 		{
-			console.log("Registration approved... Updating database");
 			response.writeHead(200, {"Content-Type": "text/html"});
-			response.write("<script>window.location.replace(\"localhost/" + sid + "/" + lastname + "/" + firstname + "/" + email + "/" + password + "/doreg?\");</script>");
+			response.write("<script>window.location.replace(\"162.156.5.173/" + sid + "/" + lastname + "/" + firstname + "/" + email + "/" + password + "/doreg?\");</script>");
 			response.end();
 		}
 	});
@@ -268,7 +263,7 @@ function tryRegister(pathname, response)
 function queryRegister(firstname, lastname, userid, email, password)
 {
 	var connection = db.createConnection({
-		host : '162.156.5.173',
+		host : 'localhost',
 		user : 'admin',
 		password : 'hype41',
 	});
@@ -301,7 +296,6 @@ function query(input, row)
 
 function sendMail(name, email)
 {
-	console.log("\n\nMAIL request received\n");
 	
 	mail.sendMail({
 			from: "rendezview.server@gmail.com",
@@ -312,21 +306,18 @@ function sendMail(name, email)
 		{
 			if(error)
 				console.log("MAIL denied, STMP server error: " + error);
-			else
-				console.log("MAIL approved, message sent to: " + email + "@my.bcit.ca");
+
 		});
 }
 
 io.sockets.on('connection', function(socket)
 {
 	var address = socket.handshake.address;
-	console.log("Socket connection established, client connected: " + address.address + ":" + address.port);
 });
 
 io.sockets.on('disconnect', function(socket)
 {
 	var address = socket.handshake.address;
-	console.log("Socket connection lost, client disconnected: " + address.address + ":" + address.port);
 });
 
 function SQLError(err)
