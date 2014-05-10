@@ -56,7 +56,7 @@ function noRegWindow()
 function tryLogin()
 {
 	var user = document.getElementById("username").value,
-		pass = document.getElementById("passwordlog").value,
+		pass = md5("a91i" + document.getElementById("passwordlog").value),
 		query = user + "/" + pass + "/login?";
 		
 	if(user==""||pass=="")
@@ -73,7 +73,7 @@ function sendReg()
 	var name = document.getElementById("name").value,
 		sid = document.getElementById("sid").value,
 		email = document.getElementById("email").value,
-		password = document.getElementById("password").value,
+		password = md5("a91i" + document.getElementById("password").value),
 		firstname = name.split(" ")[0],
 		lastname = name.split(" ")[1],
 		query = firstname + "/" + lastname + "/" + sid + "/" + email + "/" + password + "/register?";
