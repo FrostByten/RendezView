@@ -115,3 +115,27 @@ function correctLogin()
 	usersid = document.getElementById("username").value;
 	alert(usersid);
 }
+
+function updateFriendsList()
+{
+	var JSONfriends = [{"name":"Lewis Scott","sid":"A00855385"},{"name":"Jaja McHueington","sid":"A00112234"},{"name":"Ur Mum","sid":"A00696969"}],
+		list = [];
+	
+	$(".friendslist").empty();
+	
+	for(var i = 0;i<JSONfriends.length;i++)
+	{
+		var friend = JSONfriends[i];
+		list.push('<li><a href=\"\">' + friend.name + '</a><a href=\"#settingFriendPage\" id=\"' + friend.sid + '\" data-rel=\"dialog\"></a></li>');
+	}
+	
+	$(".friendslist").append(list.join(''));
+	$(".friendslist").listview('refresh');
+}
+
+function updateScheduleList()
+{
+	
+}
+
+
