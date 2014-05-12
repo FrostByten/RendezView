@@ -19,9 +19,6 @@
 		<script src="script/postdata.js"></script>
 	</head>
 	<body>
-	
-	
-	
 		<div id="loginPage" data-role="page">
 			<div data-role="header" data-position="fixed">
 				<h1>RendezView - Login</h1>
@@ -46,6 +43,7 @@
 					<div class="ui-block-b">
 					<a href="javascript:tryLogin()" data-role="button" data-transition="flow">Login</a>
 					</div>
+				</fieldset>
 			</div>
 			<div data-role="footer" data-position="fixed"></div>
 		</div>
@@ -144,14 +142,16 @@
 							<img src="images/friends.png" width="53%">
 							<br />Friends
 						</a>
-						<a href="#loginPage" data-role="button" class="logout-btn" data-transition="flow" data-direction="reverse">
+						<a href="javascript:logout()" data-role="button" class="logout-btn" data-transition="flow" data-direction="reverse">
 							<img src="images/logout.png" width="53%">
 							<br />Logout
 						</a>
 					</div>
 				</fieldset>
 			</div>
-			<div data-role="footer" data-position-"fixed"></div>
+			<div data-role="footer" data-position-"fixed">
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Ffacebook.com%2Fletsrendezview&amp;width=100&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=true&amp;height=21" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:95px; height:21px; display:block; margin: 0 auto;" allowTransparency="true"></iframe>
+			</div>
 		</div>
 		
 		
@@ -253,7 +253,7 @@
 						<input data-type="search" name="scheduleFilter" id="scheduleFilter" />
 					</form>
 				</div>
-				<ul id="scheduleList" data-role="listview" data-split-icon="gear" data-filter="true" data-input="#scheduleFilter">
+				<ul id="scheduleList" class="schedulelist" data-role="listview" data-split-icon="gear" data-filter="true" data-input="#scheduleFilter">
 					<li>
 						<a href="">Schedule 1</a>
 						<a href="#settingSchedulePage" data-rel="dialog"></a>
@@ -410,7 +410,7 @@
 
 		<div id="settingFriendPage" data-role="page">
 			<div data-role="content">
-				<a href="#friendsPage" data-role="button" data-theme="b">Delete</a>
+				<a href="javascript:deleteFriend();" data-role="button" data-theme="b">Delete</a>
 				<a href="#friendsPage" data-role="button">Cancel</a>
 			</div>
 		</div>
@@ -419,7 +419,7 @@
 		
 		<div id="settingSchedulePage" data-role="page">
 			<div data-role="content">
-				<a href="#schedulePage" data-role="button" data-theme="b">Delete</a>
+				<a href="" data-role="button" data-theme="b">Delete</a>
 				<a href="#schedulePage" data-role="button">Cancel</a>
 			</div>
 		</div>

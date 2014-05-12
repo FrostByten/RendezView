@@ -1,5 +1,7 @@
-var socket = io.connect('http://162.156.5.173:84');
-var usersid = "";
+var socket = io.connect('http://162.156.5.173:84'),
+	usersid = "",
+	friendsettingsid = "",
+	schedulesettingsid = "";
 
 socket.on('noreg', function(data)
 {
@@ -118,15 +120,15 @@ function correctLogin()
 
 function updateFriendsList()
 {
-	var JSONfriends = [{"name":"Lewis Scott","sid":"A00855385"},{"name":"Jaja McHueington","sid":"A00112234"},{"name":"Ur Mum","sid":"A00696969"}],
-		list = [];
+	var JSONfriends = [{"name":"Lewis Scott","sid":"A00855385"},{"name":"Jaja McHueington","sid":"A00112234"},{"name":"Ur Mum","sid":"A00696969"}];
+	var list = [];
 	
 	$(".friendslist").empty();
 	
-	for(var i = 0;i<JSONfriends.length;i++)
+	for(var i=0;i<JSONfriends.length;i++)
 	{
 		var friend = JSONfriends[i];
-		list.push('<li><a href=\"\">' + friend.name + '</a><a href=\"#settingFriendPage\" id=\"' + friend.sid + '\" data-rel=\"dialog\"></a></li>');
+		list.push('<li><a href=\"\">' + friend.name + '</a><a href="#settingFriendPage" data-rel="dialog"></a></li>');
 	}
 	
 	$(".friendslist").append(list.join(''));
@@ -135,7 +137,23 @@ function updateFriendsList()
 
 function updateScheduleList()
 {
+	var JSONschedule,
+		list = [];
 	
+	$(".schedulelist").empty();
+	
+	for(var i=0;i<JSONschedule.length;i++)
+	{
+		var schedule = JSONschedule[i];
+		
+	}
+	
+	$(".schedulelist").append(list.join(''));
+	$(".schedulelist").listview('refresh');
 }
 
-
+function logout()
+{
+	usersid = "";
+	window.location.replace("#loginPage");
+}
