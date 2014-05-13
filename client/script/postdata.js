@@ -23,33 +23,6 @@ socket.on('loginnotverified', function(data)
 	loginNotVerified();
 });
 
-function JSONTest()
-{
-	$.ajax(
-	{
-		url: '/',
-		type: 'POST',
-		contentType: 'application/json',
-		data: 
-		{ 
-			json: JSON.stringify(
-			{
-			  "truth": false,
-			  "meaningoflife": 42,
-			  "name": "This is a test...!",
-			  "brazil": [
-				"hue",
-				"ja",
-				"es numero uno"
-			  ]
-			})
-		},
-		dataType: 'json'
-	});
-	
-	window.location.replace("#regConfirmPage");
-}
-
 function noRegWindow()
 {
 	window.location.replace("#noReg");
@@ -115,12 +88,11 @@ function correctLogin()
 {
 	document.getElementById("incorrecttext").style.display = 'none';
 	usersid = document.getElementById("username").value;
-	alert(usersid);
 }
 
 function updateFriendsList()
 {
-	var JSONfriends = [{"name":"Lewis Scott","sid":"A00855385"},{"name":"Jaja McHueington","sid":"A00112234"},{"name":"Ur Mum","sid":"A00696969"}];
+	var JSONfriends = [{"name":"Lewis Scott","sid":"A00855385","status":"confirmed"},{"name":"Jaja McHueington","sid":"A00112234","status":"pendinga"},{"name":"Ur Mum","sid":"A00696969","status":"pendingb"}]
 	var list = [];
 	
 	$(".friendslist").empty();
@@ -128,7 +100,12 @@ function updateFriendsList()
 	for(var i=0;i<JSONfriends.length;i++)
 	{
 		var friend = JSONfriends[i];
-		list.push('<li><a href=\"\">' + friend.name + '</a><a href="#settingFriendPage" data-rel="dialog"></a></li>');
+		if(friend.status=="confirmed")
+			list.push('<li><a href=\"\">' + friend.name + '</a><a href="javascript:friendSettingMenu(\'' + friend.sid + '\');"></a></li>');
+		else if(friend.status=="pending a")
+			list.push();
+		else if(friend.status=="pending b")
+			list.push();
 	}
 	
 	$(".friendslist").append(list.join(''));
@@ -145,7 +122,7 @@ function updateScheduleList()
 	for(var i=0;i<JSONschedule.length;i++)
 	{
 		var schedule = JSONschedule[i];
-		
+		//list.push();
 	}
 	
 	$(".schedulelist").append(list.join(''));
@@ -156,4 +133,20 @@ function logout()
 {
 	usersid = "";
 	window.location.replace("#loginPage");
+}
+
+function deleteFriend()
+{
+	window.location.replace(usersid + "/" + friendsettingsid + "/deletefriend?");
+}
+
+function addFriend()
+{
+	window.location.replace(usersid + "/" + document.getElementById("searchsid") + "/addfriend?");
+}
+
+function friendSettingMenu(userstring)
+{
+	friendsettingsid = userstring;
+	window.location.replace("#settingFriendPage");
 }
