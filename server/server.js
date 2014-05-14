@@ -63,7 +63,8 @@ function serve(request, response)
 	
 	//parse the path from the url and append it to the current working directory
 	var pathname = url.parse(request.url).pathname,
-		filename = path.join(process.cwd(), pathname);
+		filename = path.join(process.cwd(), pathname),
+		list = pathname.split("/");
 		
 	if(pathname.search("validate?")!=-1)
 	{
@@ -82,17 +83,16 @@ function serve(request, response)
 	}
 	if(pathname.search("mail?")!=-1)
 	{
-		sendMail(pathname.split("/")[1], pathname.split("/")[2]);
+		sendMail(list[1], list[2]);
 		return;
 	}
 	if(pathname.search("makevalid?")!=-1)
 	{
-		makeValid(pathname.split("/")[1], response);
+		makeValid(list[1], response);
 		return;
 	}
 	if(pathname.search("doreg?")!=-1)
 	{
-		var list = pathname.split("/");
 		queryRegister(list[1], list[2], list[3], list[4]);
 		response.writeHead(200, {"Content-Type": "text/html"});
 		response.write("<script>window.location.replace(\"../../../../../../../../../../../index.html#regConfirmPage\");</script>");
@@ -101,17 +101,27 @@ function serve(request, response)
 	}
 	if(pathname.search("deletefriend?")!=-1)
 	{
-		
+		deleteFriend(list[1], list[2], response);
 		return;
 	}
 	if(pathname.search("addfriend?")!=-1)
 	{
-	
+		addFriend(list[1], list[2], response);
 		return;
 	}
-	if(pathname.search("confirmfriend")!=-1)
+	if(pathname.search("getfriends?")!=-1)
 	{
-	
+		getFriends(list[1], response);
+		return;
+	}
+	if(pathname.search("confirmfriend?")!=-1)
+	{
+		confirmFriend(list[1], list[2], response);
+		return;
+	}
+	if(pathname.search("makefriends?")!=-1)
+	{
+		makefriends(list[1], list[2], response);
 		return;
 	}
 	
@@ -133,6 +143,106 @@ function serve(request, response)
 				writeFile(file, response);
 		});
 	});
+}
+
+function makefriends(current, toadd, response)
+{
+	connection.query("use rendezview");
+	connection.query("INSERT INTO friends (userid_a, userid_b, confirmed) VALUES (\'" + current + "\', \'" + toadd + "\', 0);");
+	
+	response.writeHead(200, {"Content-Type": "text/html"});
+	response.write("<script>window.location.replace(\"../../../../../index.html#friendsPage\");</script>");
+	response.end();
+}
+
+function confirmFriend(current, toadd, response)
+{
+	connection.query("use rendezview");
+	connection.query("UPDATE friends SET confirmed=1 WHERE userid_a=\"" + toadd + "\" AND userid_b=\"" + current + "\";");
+	
+	response.writeHead(200, {"Content-Type": "text/html"});
+	response.write(<script>window.location.replace(\"../../../../../../../../index.html#friendsPage\");</script>");
+	response.end();
+}
+
+function deleteFriend(current, todelete, response)
+{
+	console.log("DELETE FRIEND request recieved");
+	console.log(current + " wants to remove " + todelete + " as a friend");
+	console.log("Deletion Approved...");
+	
+	connection.query("use rendezview");
+	connection.query("DELETE FROM friends WHERE userid_a = \"" + current + "\" AND userid_b = \"" + todelete + "\";");
+	connection.query("DELETE FROM friends WHERE userid_a = \"" + todelete + "\" AND userid_b = \"" + current + "\";");
+	
+	response.writeHead(200, {"Content-Type": "text/html"});
+	response.write("<script>window.location.replace(\"../../../../../../../../../../../index.html#friendsPage\");</script>");
+	response.end();
+}
+
+function addFriend(current, toadd, response)
+{
+	console.log("ADD FRIEND request recieved");
+	console.log(current + " wants to add " + toadd + " as a friend");
+	
+	connection.query("user rendezview");
+	connection.query("SELECT * FROM users WHERE userid = \"" + toadd + "\";", function(err, rows, fields)
+	{
+		if(err)
+			console.log("SQL Error: " + err);
+		
+		if(rows==null||rows==undefined)
+		{
+			console.log("Add denied: User " + toadd + " does not exist...");
+			response.writeHead(200, {"Content-Type": "text/html"});
+			response.write("<script>window.location.replace(\"../../../../../../../index.html#friendNotExistPage\");</script>");
+			response.end();
+		}
+	});
+	
+	//check that we don't just have to confirm it
+	connection.query("SELECT * FROM friends WHERE userid_a=\"" + toadd + "\" AND userid_b=\"" + current + "\"", function(err, rows, fields)
+	{
+		if(err)
+			console.log("SQL Error: " + err);
+		
+		if(rows!=null&&rows!=undefined)
+		{
+			console.log("Add approved: Confirming friendship...");
+			response.writeHead(200, {"Content-Type": "text/html"});
+			response.write("<script>window.location.replace(\"162.156.5.173/" + current + "/" + toadd + "/confirmfriend?");
+			response.end();
+		}
+	});
+	
+	//check that they're not already friends
+	connection.query("SELECT * FROM friends WHERE userid_a=\"" + current + "\" AND userid_b=\"" + toadd + "\";", function(err, rows, fields)
+	{
+		if(err)
+			console.log("SQL Error: " + err);
+		
+		if(rows==null||rows==undefined)
+		{
+			console.log("Add approved: Creating friendship...");
+			
+			response.writeHead(200m {"Content-Type": "text/html"});
+			response.write("<script>window.location.replace(\"162.156.5.173/" + current + "/" + toadd + "/makefriends?\");</script>");
+			response.end();
+		}
+		else
+		{
+			console.log("Add denied: friendship already exists...");
+			
+			response.writeHead(200m {"Content-Type": "text/html"});
+			response.write("<script>window.location.replace(\"../../../../../../../index.html#alreadyFriendsPage\");<\script>");
+			response.end();
+		}
+	});
+}
+
+function getFriends(userid, response)
+{
+	
 }
 
 function makeValid(name, response)

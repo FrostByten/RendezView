@@ -146,6 +146,12 @@ function deleteFriend()
 	updateFriendsList();
 }
 
+function denyFriend()
+{
+	window.location.replace(usersid + "/" + friendaddid + "/deletefriend?");
+	updateFriendList();
+}
+
 function addFriend()
 {
 	window.location.replace(usersid + "/" + document.getElementById("searchsid") + "/addfriend?");
@@ -162,4 +168,10 @@ function friendSettingMenu(userstring)
 {
 	friendsettingsid = userstring;
 	window.location.replace("#settingFriendPage");
+}
+
+function denyFriend()
+{
+	window.location.replace(usersid + "/" + friendaddid + "/deletefriend?");
+	updateFriendsList();
 }

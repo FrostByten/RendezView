@@ -499,9 +499,10 @@
 			<div data-role="content">
 				<strong><h1>Add Friend Back</h1></strong><br />
 				This person has added you to their friends list.<br />
-				You can add them back by pressing the button below.<br />
+				You can confirm your friendship by pressing the button below.<br />
 				<br />
-				<a href="javascript:addFriendBack();" data-role="button" data-theme="b">Add</a>
+				<a href="javascript:addFriendBack();" data-role="button" data-theme="c">Approve</a>
+				<a href="javascript:denyFriend();" data-role="button" data-theme="b">Deny</a>
 				<a href="#friendsPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
 			</div>
 		</div>
@@ -513,6 +514,28 @@
 				<strong><h1>Friendship not confirmed</h1><br />
 				You have friended this user, however they have not yet friended you back.<br />
 				This user needs to add you to their friends list before you can see their location.<br />
+				<br />
+				<a href="#friendsPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+			</div>
+		</div>
+		
+		
+		
+		<div id="friendNotExistPage" data-role="page">
+			<div data-role="content">
+				<strong><h1>User does not exist</h1><br />
+				You have attempted to friend a user that does not exist.<br />
+				Check the Student ID, and make sure that this person has a RendezView account<br />
+				<br />
+				<a href="#friendsPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+			</div>
+		</div>
+		
+		
+		<div id="alreadyFriendsPage" data-role="page">
+			<div data-role="content">
+				<strong><h1>User already friended</h1><br />
+				You have attempted to friend a user that is already your friend.<br />
 				<br />
 				<a href="#friendsPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
 			</div>
