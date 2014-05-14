@@ -11,6 +11,7 @@ var http = require('http'),
 //----------------Global Vars--------------
 var httpport = 84,
 	sqlport = 3306,
+	externalip = "162.156.5.173",
 	connection = db.createConnection({
 		host : 'localhost',
 		user : 'admin',
@@ -185,6 +186,13 @@ function addFriend(current, toadd, response)
 	console.log("ADD FRIEND request recieved");
 	console.log(current + " wants to add " + toadd + " as a friend");
 	
+	if(current.localeCompare(toadd)==0)
+	{
+		console.log("Add request denied: User cannot add self as friend...');
+		response.writeHead(200, {"Content-Type": "text/html"});
+		response.write("<script>window.location.replace(\"../../../../../../../index.html#friendNotSelfPage\");</script>");
+		response.end();
+	
 	connection.query("user rendezview");
 	connection.query("SELECT * FROM users WHERE userid = \"" + toadd + "\";", function(err, rows, fields)
 	{
@@ -210,7 +218,7 @@ function addFriend(current, toadd, response)
 		{
 			console.log("Add approved: Confirming friendship...");
 			response.writeHead(200, {"Content-Type": "text/html"});
-			response.write("<script>window.location.replace(\"162.156.5.173/" + current + "/" + toadd + "/confirmfriend?");
+			response.write("<script>window.location.replace(\"" + externalip + "/" + current + "/" + toadd + "/confirmfriend?");
 			response.end();
 		}
 	});
@@ -225,15 +233,15 @@ function addFriend(current, toadd, response)
 		{
 			console.log("Add approved: Creating friendship...");
 			
-			response.writeHead(200m {"Content-Type": "text/html"});
-			response.write("<script>window.location.replace(\"162.156.5.173/" + current + "/" + toadd + "/makefriends?\");</script>");
+			response.writeHead(200 {"Content-Type": "text/html"});
+			response.write("<script>window.location.replace(\"" + externalip + "/" + current + "/" + toadd + "/makefriends?\");</script>");
 			response.end();
 		}
 		else
 		{
 			console.log("Add denied: friendship already exists...");
 			
-			response.writeHead(200m {"Content-Type": "text/html"});
+			response.writeHead(200 {"Content-Type": "text/html"});
 			response.write("<script>window.location.replace(\"../../../../../../../index.html#alreadyFriendsPage\");<\script>");
 			response.end();
 		}
@@ -242,7 +250,52 @@ function addFriend(current, toadd, response)
 
 function getFriends(userid, response)
 {
+	var JSONfriends = [];
 	
+	connection.query("use rendezview");
+	connection.query("SELECT * FROM friends WHERE userid_a=\"" + userid + "\" OR userid_b=\"" + userid + "\";", function(err, rows, fields)
+	{
+		if(err)
+			console.log("SQL Error: " + err);
+		
+		if(rows==null||rows==undefined)
+		{
+			//this guy's a loser...
+			return;
+		}
+		
+		for(var i=0;i<rows.length;i++)
+		{
+			var row = rows[0],
+				sid = row.userid_a;
+				
+			if(sid.localeCompare(userid)==0)
+				sid = row.userid_b;
+				
+			var obj = {"name":"","sid":sid,"status":row.confirmed}
+			JSONfriends.push(obj);
+		}
+	});
+	
+	for(var i=0;i<JSONfriends.length;i++)
+	{
+		connection.query("SELECT * FROM users WHERE userid=\"" + JSONfriends[i].sid + "\";", function(err, rows, fields)
+		{
+			if(err)
+				console.log("SQL Error: " + err);
+			
+			if(rows==null||rows==undefined)
+				return;
+			
+			JSONfriends[i].name = rows[0].name;
+		});
+	}
+	
+	var JSONtext = JSON.stringify(JSONfriends);
+	console.log("Printing friends for: " + userid);
+	console.log("\n................................\n");
+	console.log(JSONtext);
+	console.log("\n................................\n");
 }
 
 function makeValid(name, response)
@@ -303,7 +356,7 @@ function validate(pathname, response)
 			else
 			{
 				response.writeHead(200, {"Content-Type": "text/html"});
-				response.write("<script>window.location.replace(\"162.156.5.173/" + name + "/makevalid?\");</script>");
+				response.write("<script>window.location.replace(\"" + externalip + "/" + name + "/makevalid?\");</script>");
 				response.end();
 			}
 		}
@@ -378,7 +431,7 @@ function tryRegister(pathname, response)
 		else
 		{
 			response.writeHead(200, {"Content-Type": "text/html"});
-			response.write("<script>window.location.replace(\"162.156.5.173/" + sid + "/" + name + "/" + email + "/" + password + "/doreg?\");</script>");
+			response.write("<script>window.location.replace(\"" + externalip + "/" + sid + "/" + name + "/" + email + "/" + password + "/doreg?\");</script>");
 			response.end();
 		}
 	});
@@ -425,7 +478,7 @@ function sendMail(name, email)
 			from: "rendezview.server@gmail.com",
 			to: email + "@my.bcit.ca",
 			subject: "Welcome to RendezView",
-			text: "Thank you for joining RendezView!\n\nYour registration is complete, you may now verify your account by clicking the following link:\n\n  162.156.5.173:84/" + name + "/validate?"
+			text: "Thank you for joining RendezView!\n\nYour registration is complete, you may now verify your account by clicking the following link:\n\n  " + externalip + ":" + httpport + "/" + name + "/validate?"
 		}, function(error, response)
 		{
 			if(error)

@@ -91,20 +91,29 @@ function correctLogin()
 
 function updateFriendsList()
 {
-	var JSONfriends = [{"name":"Lewis Scott","sid":"A00855385","status":"confirmed"},{"name":"Jaja McHueington","sid":"A00112234","status":"pendinga"},{"name":"Ur Mum","sid":"A00696969","status":"pendingb"}]
-	var list = [];
+	var JSONtext = "",
+		JSONfriends = JSON.parse(JSONtext),
+		list = [];
 	
 	$(".friendslist").empty();
 	
 	for(var i=0;i<JSONfriends.length;i++)
 	{
 		var friend = JSONfriends[i];
+		if(friend.status=="pendingb")
+			list.push('<li><a href=\"javascript:addBack(\'' + friend.sid + '\');\" data-rel="dialog" data-transition="pop" data-theme="c">' + friend.name + '<span style=\"float:right;\">(Added You)</span></a><a href="javascript:friendSettingMenu(\'' + friend.sid + '\');" data-theme="a"></a></li>');
+	}
+	for(var i=0;i<JSONfriends.length;i++)
+	{
+		var friend = JSONfriends[i];
+		if(friend.status=="pendinga")
+			list.push('<li><a href=\"#waitConfirmPage\" data-rel="dialog" data-transition="pop">' + friend.name + '<span style=\"float:right;\">(Pending)</span></a><a href="javascript:friendSettingMenu(\'' + friend.sid + '\');"></a></li>');
+	}
+	for(var i=0;i<JSONfriends.length;i++)
+	{
+		var friend = JSONfriends[i];
 		if(friend.status=="confirmed")
 			list.push('<li><a href=\"javascript:locateFriend(\'' + friend.sid + '\');\">' + friend.name + '</a><a href="javascript:friendSettingMenu(\'' + friend.sid + '\');"></a></li>');
-		else if(friend.status=="pendinga")
-			list.push('<li><a href=\"#waitConfirmPage\" data-rel="dialog" data-transition="pop">' + friend.name + '<span style=\"float:right;\">(Pending)</span></a><a href="javascript:friendSettingMenu(\'' + friend.sid + '\');"></a></li>');
-		else if(friend.status=="pendingb")
-			list.push('<li><a href=\"javascript:addBack(\'' + friend.sid + '\');\" data-rel="dialog" data-transition="pop" data-theme="c">' + friend.name + ' added you</a><a href="javascript:friendSettingMenu(\'' + friend.sid + '\');" data-theme="c"></a></li>');
 	}
 	
 	$(".friendslist").append(list.join(''));
