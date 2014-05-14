@@ -1,6 +1,7 @@
 var socket = io.connect('http://162.156.5.173:84'),
 	usersid = "",
 	friendsettingsid = "",
+	friendaddid = "",
 	schedulesettingsid = "";
 
 socket.on('noreg', function(data)
@@ -49,13 +50,11 @@ function sendReg()
 		sid = document.getElementById("sid").value,
 		email = document.getElementById("email").value,
 		password = md5("a91i" + document.getElementById("password").value),
-		firstname = name.split(" ")[0],
-		lastname = name.split(" ")[1],
-		query = firstname + "/" + lastname + "/" + sid + "/" + email + "/" + password + "/register?";
+		query = name + "/" + sid + "/" + email + "/" + password + "/register?";
 		
 	if(document.getElementById("password").value!=document.getElementById("passconf").value)
 		window.location.replace("#noConfirm");
-	if(firstname==""||lastname==""||sid==""||password==""||email=="")
+	if(name==""||sid==""||password==""||email=="")
 	{
 		window.location.replace("#noReg");
 		return;
@@ -101,15 +100,21 @@ function updateFriendsList()
 	{
 		var friend = JSONfriends[i];
 		if(friend.status=="confirmed")
-			list.push('<li><a href=\"\">' + friend.name + '</a><a href="javascript:friendSettingMenu(\'' + friend.sid + '\');"></a></li>');
-		else if(friend.status=="pending a")
-			list.push();
-		else if(friend.status=="pending b")
-			list.push();
+			list.push('<li><a href=\"javascript:locateFriend(\'' + friend.sid + '\');\">' + friend.name + '</a><a href="javascript:friendSettingMenu(\'' + friend.sid + '\');"></a></li>');
+		else if(friend.status=="pendinga")
+			list.push('<li><a href=\"#waitConfirmPage\" data-rel="dialog" data-transition="pop">' + friend.name + '<span style=\"float:right;\">(Pending)</span></a><a href="javascript:friendSettingMenu(\'' + friend.sid + '\');"></a></li>');
+		else if(friend.status=="pendingb")
+			list.push('<li><a href=\"javascript:addBack(\'' + friend.sid + '\');\" data-rel="dialog" data-transition="pop" data-theme="c">' + friend.name + ' added you</a><a href="javascript:friendSettingMenu(\'' + friend.sid + '\');" data-theme="c"></a></li>');
 	}
 	
 	$(".friendslist").append(list.join(''));
 	$(".friendslist").listview('refresh');
+}
+
+function addBack(friendstring)
+{
+	friendaddid = friendstring;
+	window.location.replace("#addBackPage");
 }
 
 function updateScheduleList()
@@ -138,11 +143,19 @@ function logout()
 function deleteFriend()
 {
 	window.location.replace(usersid + "/" + friendsettingsid + "/deletefriend?");
+	updateFriendsList();
 }
 
 function addFriend()
 {
 	window.location.replace(usersid + "/" + document.getElementById("searchsid") + "/addfriend?");
+	updateFriendsList();
+}
+
+function addFriendBack()
+{
+	window.location.replace(usersid + "/" + friendaddid + "/confirmfriend?");
+	updateFriendsList();
 }
 
 function friendSettingMenu(userstring)

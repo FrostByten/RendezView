@@ -93,11 +93,26 @@ function serve(request, response)
 	if(pathname.search("doreg?")!=-1)
 	{
 		var list = pathname.split("/");
-		queryRegister(list[1], list[2], list[3], list[4], list[5]);
+		queryRegister(list[1], list[2], list[3], list[4]);
 		response.writeHead(200, {"Content-Type": "text/html"});
 		response.write("<script>window.location.replace(\"../../../../../../../../../../../index.html#regConfirmPage\");</script>");
 		response.end();
-		return
+		return;
+	}
+	if(pathname.search("deletefriend?")!=-1)
+	{
+		
+		return;
+	}
+	if(pathname.search("addfriend?")!=-1)
+	{
+	
+		return;
+	}
+	if(pathname.search("confirmfriend")!=-1)
+	{
+	
+		return;
 	}
 	
 	fs.exists(filename, function(exists)
@@ -237,11 +252,10 @@ function tryLogin(pathname, response)
 function tryRegister(pathname, response)
 {
 	var data = pathname.split("/"),
-		firstname = data[1],
-		lastname = data[2],
-		sid = data[3],
-		email = data[4],
-		password = data[5];
+		name = data[1],
+		sid = data[2],
+		email = data[3],
+		password = data[4];
 	
 	connection.query("SELECT * FROM users WHERE userID=\"" + sid + "\"", function(err, rows, fields)
 	{
@@ -254,13 +268,13 @@ function tryRegister(pathname, response)
 		else
 		{
 			response.writeHead(200, {"Content-Type": "text/html"});
-			response.write("<script>window.location.replace(\"162.156.5.173/" + sid + "/" + lastname + "/" + firstname + "/" + email + "/" + password + "/doreg?\");</script>");
+			response.write("<script>window.location.replace(\"162.156.5.173/" + sid + "/" + name + "/" + email + "/" + password + "/doreg?\");</script>");
 			response.end();
 		}
 	});
 }
 
-function queryRegister(firstname, lastname, userid, email, password)
+function queryRegister(name, userid, email, password)
 {
 	var connection = db.createConnection({
 		host : 'localhost',
@@ -270,7 +284,7 @@ function queryRegister(firstname, lastname, userid, email, password)
 	
 	connection.query("use rendezview");
 	
-	connection.query("INSERT INTO users (userID, lastName, firstName, email, password, validated) VALUES (\'" + userid + "\', \'" + lastname + "\', \'" + firstname + "\', \'" + email + "\', \'" + password + "\', 0);", function(err, response)
+	connection.query("INSERT INTO users (userID, name, email, password, validated) VALUES (\'" + userid + "\', \'" + name + "\', \'" + email + "\', \'" + password + "\', 0);", function(err, response)
 	{
 		if(err)
 			console.log(err);
