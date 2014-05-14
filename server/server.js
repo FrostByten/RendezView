@@ -125,6 +125,11 @@ function serve(request, response)
 		makefriends(list[1], list[2], response);
 		return;
 	}
+	if(pathname.search("locatefriend?")!=-1)
+	{
+		locateFriend(list[1], response);
+		return;
+	}
 	
 	fs.exists(filename, function(exists)
 	{
@@ -153,6 +158,18 @@ function makefriends(current, toadd, response)
 	
 	response.writeHead(200, {"Content-Type": "text/html"});
 	response.write("<script>window.location.replace(\"../../../../../index.html#friendsPage\");</script>");
+	response.end();
+}
+
+function locateFriend(friendid, response)//unfinished, locate via scheduling...........................................................................................................................................
+{
+	var location = "huehuehue";
+
+	connection.query("use rendezview');
+	//location logic here...
+	
+	response.writeHead(200, {"Content-Type": "text/html"});
+	response.write("<script>friendlocation=\'" + location + "\'; showFriendLocation();</script>");
 	response.end();
 }
 
@@ -296,13 +313,16 @@ function getFriends(userid, response)
 	console.log("\n................................\n");
 	console.log(JSONtext);
 	console.log("\n................................\n");
+	
+	response.writeHead(200, {"Content-Type": "text/html"});
+	response.write("<script>doFriendUpdate(\"" + JSONtext + "\");</script>");
+	response.end();
 }
 
 function makeValid(name, response)
 {
 	connection.query("UPDATE users SET validated=1 WHERE userID = \"" + name + "\"");
 	response.writeHead(200, {"Content-Type": "text/html"});
-	
     response.write("<script>window.location.replace(\"../../../index.html#emailValidated\");</script>");
 	response.end();
 }

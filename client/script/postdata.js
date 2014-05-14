@@ -2,7 +2,8 @@ var socket = io.connect('http://162.156.5.173:84'),
 	usersid = "",
 	friendsettingsid = "",
 	friendaddid = "",
-	schedulesettingsid = "";
+	schedulesettingsid = "",
+	friendlocation = "";
 
 socket.on('noreg', function(data)
 {
@@ -27,6 +28,14 @@ socket.on('loginnotverified', function(data)
 function noRegWindow()
 {
 	window.location.replace("#noReg");
+}
+
+function showFriendLocation()
+{
+	
+
+	document.getElementById("friendlocation").innerHTML = friendlocation;
+	window.location.replace("../../../../../../../../index.html#friendLocationPage");
 }
 
 function tryLogin()
@@ -89,10 +98,9 @@ function correctLogin()
 	usersid = document.getElementById("username").value;
 }
 
-function updateFriendsList()
+function doFriendUpdate(JSONtext)
 {
-	var JSONtext = "",
-		JSONfriends = JSON.parse(JSONtext),
+	var JSONfriends = JSON.parse(JSONtext),
 		list = [];
 	
 	$(".friendslist").empty();
@@ -118,6 +126,11 @@ function updateFriendsList()
 	
 	$(".friendslist").append(list.join(''));
 	$(".friendslist").listview('refresh');
+}
+
+function updateFriendsList()
+{
+	window.location.replace(usersid + "/getfriends?");
 }
 
 function addBack(friendstring)
@@ -183,4 +196,9 @@ function denyFriend()
 {
 	window.location.replace(usersid + "/" + friendaddid + "/deletefriend?");
 	updateFriendsList();
+}
+
+function locateFriend(friendid)
+{
+	window.location.replace(friendid + "/locatefriend?");
 }
