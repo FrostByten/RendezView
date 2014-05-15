@@ -12,7 +12,7 @@ var http = require('http'),
 var httpport = 84,
 	sqlport = 3306,
 	externalip = "162.156.5.173",
-	dbip = "localhost",
+	dbip = "localhost",h
 	connection = db.createConnection({
 		host : dbip,
 		user : 'admin',
