@@ -7,8 +7,7 @@ var socket = io.connect('http://162.156.5.173:84'),
 	selectedscheduleday = "",
 	selectedscheduletime = "",
 	locations = [{"building":"SW5","rooms":[{"room":"1850","locid":"someval"},{"room":"1840","locid":"someval2"},{"room":"1822","locid":"someval3"}]},{"building":"SW5","rooms":[{"room":"1850","locid":"someval"}]}];
-
-$(document).ready(onReady);
+    
 
 socket.on('noreg', function(data)
 {
@@ -57,7 +56,7 @@ function tryLogin()
 		window.location.replace("#loginIncorrect");
 		return;
 	}
-	usersid = user;
+	window.name = user;
 	window.location.replace(query);
 }
 
@@ -89,7 +88,7 @@ function sendReg()
 
 function resendEmail()
 {
-	window.location.replace(usersid + "/mail?");
+	window.location.replace(window.name + "/mail?");
 	window.location.replace("#loginPage");
 }
 
@@ -101,19 +100,19 @@ function loginNotVerified()
 function incorrectLogin()
 {
 	document.getElementById("incorrecttext").style.display = 'block';
-    alert("here");
+    //alert("here");
 }
 
 function correctLogin()
 {
 	document.getElementById("incorrecttext").style.display = 'none';
-	usersid = document.getElementById("username").value;
-	window.location.replace(usersid + "/getfriends?");
+	window.name = document.getElementById("username").value;
+	window.location.replace(window.name + "/getfriends?");
 }
 
 function doFriendUpdate(JSONtext)
 {
-	alert("dofriendupdatecalled");
+	//alert("dofriendupdatecalled");
 	var JSONfriends = JSON.parse(JSONtext),
 		list = [];
 	
@@ -144,7 +143,7 @@ function doFriendUpdate(JSONtext)
 
 function updateFriendsList()
 {
-	window.location.replace(usersid + "/getfriends?");
+	window.location.replace(window.name + "/getfriends?");
 }
 
 function addBack(friendstring)
@@ -183,34 +182,36 @@ function deleteSchedule()
 
 }
 
+function login(dervar)
+{
+    window.name=dervar;
+    window.location.replace("../../../index.html#mainPage");
+}
+
 function logout()
 {
-	usersid = "";
+	window.name = "";
 	window.location.replace("#loginPage");
 }
 
 function deleteFriend()
 {
-	window.location.replace(usersid + "/" + friendsettingsid + "/deletefriend?");
-	updateFriendsList();
+	window.location.replace(window.name + "/" + friendsettingsid + "/deletefriend?");
 }
 
 function denyFriend()
 {
-	window.location.replace(usersid + "/" + friendaddid + "/deletefriend?");
-	updateFriendList();
+	window.location.replace(window.name + "/" + friendaddid + "/deletefriend?");
 }
 
 function addFriend()
 {
-	window.location.replace(usersid + "/" + document.getElementById("searchsid") + "/addfriend?");
-	updateFriendsList();
+	window.location.replace("../../../../../../" + window.name + "/" + document.getElementById("searchsid").value + "/addfriend?");
 }
 
 function addFriendBack()
 {
-	window.location.replace(usersid + "/" + friendaddid + "/confirmfriend?");
-	updateFriendsList();
+	window.location.replace(window.name + "/" + friendaddid + "/confirmfriend?");
 }
 
 function friendSettingMenu(userstring)
@@ -221,7 +222,7 @@ function friendSettingMenu(userstring)
 
 function denyFriend()
 {
-	window.location.replace(usersid + "/" + friendaddid + "/deletefriend?");
+	window.location.replace(window.name + "/" + friendaddid + "/deletefriend?");
 	updateFriendsList();
 }
 

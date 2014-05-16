@@ -126,7 +126,7 @@ function serve(request, response)
 	}
 	if(pathname.search("makefriends?")!=-1)
 	{
-		makefriends(list[1], list[2], response);
+		makefriends(list[2], list[3], response);
 		return;
 	}
 	if(pathname.search("locatefriend?")!=-1)
@@ -269,11 +269,11 @@ function addFriend(current, toadd, response)
 function getFriends(userid, response)
 {
 	var JSONfriends = [];
-	
+    
 	wait.forMethod(connection, 'query', "use rendezview");
 	var rows = wait.forMethod(connection, 'query', "SELECT * FROM friends WHERE userid_a=\"" + userid + "\" OR userid_b=\"" + userid + "\";");
-		
-	if(rows==null||rows==undefined)
+    
+	if(rows==null||rows==undefined||rows.length==0)
 	{
 		//this guy's a loser...
 		console.log("User: " + userid + " has no friends!!! What a scrub!");
@@ -284,7 +284,7 @@ function getFriends(userid, response)
 		
 		return;
 	}
-	
+    
 	for(var i=0;i<rows.length;i++)
 	{
 		var sid = "";
@@ -300,11 +300,13 @@ function getFriends(userid, response)
 	{
 		var rows = wait.forMethod(connection, 'query', "SELECT * FROM users WHERE userid=\"" + JSONfriends[i].sid + "\";");
 		
-		if(rows==null||rows==undefined)
+		if(JSON.stringify(rows[0])=="[]"||rows==undefined||rows[0]==undefined)
 			return;
 		
 		JSONfriends[i].name = rows[0].name;
 	}
+    
+    console.log("Displaying JSON data to return: " + JSON.stringify(JSONfriends));
 	
 	response.writeHead(200, {"Content-Type": "text/html"});
 	response.write("<script>doFriendUpdate(\"" + JSON.stringify(JSONfriends) + "\");</script");
@@ -417,9 +419,10 @@ function tryLogin(pathname, response)
 			response.end();
 			return;
 		}
-
+        console.log("Login successful");
+        console.log(list[1]);
 		response.writeHead(200, {"Content-Type": "text/html"});
-		response.write("<script>window.location.replace(\"../../../index.html#mainPage\");</script>");
+		response.write("<script>window.location.replace(\"../../../../index.html#mainPage\");</script>");
 		response.end();
 	});
 }
