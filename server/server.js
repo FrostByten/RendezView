@@ -93,12 +93,12 @@ function serve(request, response)
 	}
 	if(pathname.search("makevalid?")!=-1)
 	{
-		makeValid(list[1], response);
+		makeValid(list[2], response);
 		return;
 	}
 	if(pathname.search("doreg?")!=-1)
 	{
-		queryRegister(list[1], list[2], list[3], list[4]);
+		queryRegister(list[3], list[2], list[4], list[5]);
 		response.writeHead(200, {"Content-Type": "text/html"});
 		response.write("<script>window.location.replace(\"../../../../../../../../../../../index.html#regConfirmPage\");</script>");
 		response.end();
@@ -131,7 +131,7 @@ function serve(request, response)
 	}
 	if(pathname.search("locatefriend?")!=-1)
 	{
-		locateFriend(list[1], response);
+		locateFriend(list[2], response);
 		return;
 	}
 	
@@ -346,7 +346,6 @@ function validate(pathname, response)
 {
 	
 	var name = pathname.split("/")[1];
-	
 	connection.query("use rendezview");
 	connection.query("SELECT * FROM users WHERE userid = \"" + name + "\"", function(err, rows, fields)
 	{
@@ -370,7 +369,7 @@ function validate(pathname, response)
 			else
 			{
 				response.writeHead(200, {"Content-Type": "text/html"});
-				response.write("<script>window.location.replace(\"" + externalstring + "/" + name + "/makevalid?\");</script>");
+				response.write("<script>window.location.replace(\'../../../../../../../" + externalstring + "/" + name + "/makevalid?\');</script>");
 				response.end();
 			}
 		}
@@ -419,8 +418,7 @@ function tryLogin(pathname, response)
 			response.end();
 			return;
 		}
-        console.log("Login successful");
-        console.log(list[1]);
+        console.log("Login successful: " + list[1]);
 		response.writeHead(200, {"Content-Type": "text/html"});
 		response.write("<script>window.location.replace(\"../../../../index.html#mainPage\");</script>");
 		response.end();
@@ -446,7 +444,7 @@ function tryRegister(pathname, response)
 		else
 		{
 			response.writeHead(200, {"Content-Type": "text/html"});
-			response.write("<script>window.location.replace(\"" + externalstring + "/" + sid + "/" + name + "/" + email + "/" + password + "/doreg?\");</script>");
+			response.write("<script>window.location.replace(\'../../../../../../../../../" + externalstring + "/" + sid + "/" + name + "/" + email + "/" + password + "/doreg?\');</script>");
 			response.end();
 		}
 	});
@@ -454,12 +452,6 @@ function tryRegister(pathname, response)
 
 function queryRegister(name, userid, email, password)
 {
-	var connection = db.createConnection({
-		host : 'localhost',
-		user : 'admin',
-		password : 'hype41',
-	});
-	
 	connection.query("use rendezview");
 	
 	connection.query("INSERT INTO users (userID, name, email, password, validated) VALUES (\'" + userid + "\', \'" + name + "\', \'" + email + "\', \'" + password + "\', 0);", function(err, response)
@@ -498,7 +490,6 @@ function sendMail(name, email)
 		{
 			if(error)
 				console.log("MAIL denied, STMP server error: " + error);
-
 		});
 }
 

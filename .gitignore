@@ -15,6 +15,7 @@ local.properties
 .classpath
 .settings/
 .loadpath
+server/node_modules/
 
 # External tool builders
 .externalToolBuilders/
