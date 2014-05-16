@@ -5,7 +5,10 @@ var socket = io.connect('http://162.156.5.173:84'),
 	schedulesettingsid = "",
 	friendlocation = "",
 	selectedscheduleday = "",
-	selectedscheduletime = "";
+	selectedscheduletime = "",
+	locations = [{"building":"SW5","rooms":[{"room":"1850","locid":"someval"},{"room":"1840","locid":"someval2"},{"room":"1822","locid":"someval3"}]},{"building":"SW5","rooms":[{"room":"1850","locid":"someval"}]}];
+
+$(document).ready(onReady);
 
 socket.on('noreg', function(data)
 {
@@ -27,6 +30,11 @@ socket.on('loginnotverified', function(data)
 	loginNotVerified();
 });
 
+function onReady()
+{
+	//populate the update lists
+}
+
 function noRegWindow()
 {
 	window.location.replace("#noReg");
@@ -43,7 +51,7 @@ function tryLogin()
 	var user = document.getElementById("username").value,
 		pass = md5("a91i" + document.getElementById("passwordlog").value),
 		query = user + "/" + pass + "/login?";
-		
+	
 	if(user==""||pass=="")
 	{
 		window.location.replace("#loginIncorrect");
@@ -62,7 +70,11 @@ function sendReg()
 		query = name + "/" + sid + "/" + email + "/" + password + "/register?";
 		
 	if(document.getElementById("password").value!=document.getElementById("passconf").value)
+	{
 		window.location.replace("#noConfirm");
+		return;
+	}
+	
 	if(name==""||sid==""||password==""||email=="")
 	{
 		window.location.replace("#noReg");
@@ -96,10 +108,12 @@ function correctLogin()
 {
 	document.getElementById("incorrecttext").style.display = 'none';
 	usersid = document.getElementById("username").value;
+	window.location.replace(usersid + "/getfriends?");
 }
 
 function doFriendUpdate(JSONtext)
 {
+	alert("dofriendupdatecalled");
 	var JSONfriends = JSON.parse(JSONtext),
 		list = [];
 	

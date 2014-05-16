@@ -6,13 +6,15 @@ var http = require('http'),
 	fs = require('fs'),
 	db = require('mysql'),
 	socketio = require('socket.io'),
-	nodemailer = require('nodemailer');
+	nodemailer = require('nodemailer'),
+	wait = require('wait.for');
 	
 //----------------Global Vars--------------
 var httpport = 84,
 	sqlport = 3306,
 	externalip = "162.156.5.173",
-	dbip = "localhost",h
+	externalstring = externalip + ':' + httpport,
+	dbip = "localhost",
 	connection = db.createConnection({
 		host : dbip,
 		user : 'admin',
@@ -21,6 +23,7 @@ var httpport = 84,
 
 //-------------------Main------------------
 console.log("Starting HTTP Server on port: " + httpport);
+console.log("External connection address: http://" + externalstring + "/");
 connection.connect();
 var server = http.createServer(onRequest).listen(httpport),
 	io = socketio.listen(server, {log: false}),
@@ -38,7 +41,7 @@ function onRequest(request, response)
 	if(request.method === "POST")
 		parseJSON(request, response);
 	else //request method is GET or HEAD
-		serve(request, response);
+		wait.launchFiber(serve, request, response);
 }
 
 function parseJSON(request, response)
@@ -155,7 +158,11 @@ function serve(request, response)
 function makefriends(current, toadd, response)
 {
 	connection.query("use rendezview");
-	connection.query("INSERT INTO friends (userid_a, userid_b, confirmed) VALUES (\'" + current + "\', \'" + toadd + "\', 0);");
+	connection.query("INSERT INTO friends (userid_a, userid_b, confirmed) VALUES (\'" + current + "\', \'" + toadd + "\', 0);", function(err, rows, fields)
+	{
+		if(err)
+			console.log(err);
+	});
 	
 	response.writeHead(200, {"Content-Type": "text/html"});
 	response.write("<script>window.location.replace(\"../../../../../index.html#friendsPage\");</script>");
@@ -166,7 +173,7 @@ function locateFriend(friendid, response)//unfinished, locate via scheduling....
 {
 	var location = "huehuehue";
 
-	connection.query("use rendezview');
+	connection.query("use rendezview");
 	//location logic here...
 	
 	response.writeHead(200, {"Content-Type": "text/html"});
@@ -180,7 +187,7 @@ function confirmFriend(current, toadd, response)
 	connection.query("UPDATE friends SET confirmed=1 WHERE userid_a=\"" + toadd + "\" AND userid_b=\"" + current + "\";");
 	
 	response.writeHead(200, {"Content-Type": "text/html"});
-	response.write(<script>window.location.replace(\"../../../../../../../../index.html#friendsPage\");</script>");
+	response.write("<script>window.location.replace(\"../../../../../../../../index.html#friendsPage\");</script>");
 	response.end();
 }
 
@@ -204,119 +211,103 @@ function addFriend(current, toadd, response)
 	console.log("ADD FRIEND request recieved");
 	console.log(current + " wants to add " + toadd + " as a friend");
 	
-	if(current.localeCompare(toadd)==0)
+	if(current==toadd)
 	{
-		console.log("Add request denied: User cannot add self as friend...');
+		console.log("Add request denied: User cannot add self as friend...");
 		response.writeHead(200, {"Content-Type": "text/html"});
 		response.write("<script>window.location.replace(\"../../../../../../../index.html#friendNotSelfPage\");</script>");
 		response.end();
+		return;
+	}
 	
-	connection.query("user rendezview");
-	connection.query("SELECT * FROM users WHERE userid = \"" + toadd + "\";", function(err, rows, fields)
+	wait.forMethod(connection, 'query', "use rendezview");
+	var rows = wait.forMethod(connection, 'query', "SELECT * FROM users WHERE userid = \"" + toadd + "\";");
+
+	if(rows==null||rows==undefined)
 	{
-		if(err)
-			console.log("SQL Error: " + err);
-		
-		if(rows==null||rows==undefined)
-		{
-			console.log("Add denied: User " + toadd + " does not exist...");
-			response.writeHead(200, {"Content-Type": "text/html"});
-			response.write("<script>window.location.replace(\"../../../../../../../index.html#friendNotExistPage\");</script>");
-			response.end();
-		}
-	});
+		console.log("Add denied: User " + toadd + " does not exist...");
+		response.writeHead(200, {"Content-Type": "text/html"});
+		response.write("<script>window.location.replace(\"../../../../../../../index.html#friendNotExistPage\");</script>");
+		response.end();
+	}
 	
 	//check that we don't just have to confirm it
-	connection.query("SELECT * FROM friends WHERE userid_a=\"" + toadd + "\" AND userid_b=\"" + current + "\"", function(err, rows, fields)
+	var rows2 = wait.forMethod(connection, 'query', "SELECT * FROM friends WHERE userid_a=\"" + toadd + "\" AND userid_b=\"" + current + "\" AND confirmed=0");
+	
+	if(JSON.stringify(rows2)!="[]")
 	{
-		if(err)
-			console.log("SQL Error: " + err);
-		
-		if(rows!=null&&rows!=undefined)
-		{
-			console.log("Add approved: Confirming friendship...");
-			response.writeHead(200, {"Content-Type": "text/html"});
-			response.write("<script>window.location.replace(\"" + externalip + "/" + current + "/" + toadd + "/confirmfriend?");
-			response.end();
-		}
-	});
+		console.log("Add approved: Confirming friendship...");
+		response.writeHead(200, {"Content-Type": "text/html"});
+		response.write("<script>window.location.replace(\"../../../../../../../" + externalstring + "/" + current + "/" + toadd + "/confirmfriend?\");</script>");
+		response.end();
+		return;
+	}
 	
 	//check that they're not already friends
-	connection.query("SELECT * FROM friends WHERE userid_a=\"" + current + "\" AND userid_b=\"" + toadd + "\";", function(err, rows, fields)
+	var rows3 = wait.forMethod(connection, 'query', "SELECT * FROM friends WHERE userid_a=\"" + current + "\" AND userid_b=\"" + toadd + "\";");
+
+	if(JSON.stringify(rows3)=="[]")
 	{
-		if(err)
-			console.log("SQL Error: " + err);
+		console.log("Add approved: Creating friendship...");
 		
-		if(rows==null||rows==undefined)
-		{
-			console.log("Add approved: Creating friendship...");
-			
-			response.writeHead(200 {"Content-Type": "text/html"});
-			response.write("<script>window.location.replace(\"" + externalip + "/" + current + "/" + toadd + "/makefriends?\");</script>");
-			response.end();
-		}
-		else
-		{
-			console.log("Add denied: friendship already exists...");
-			
-			response.writeHead(200 {"Content-Type": "text/html"});
-			response.write("<script>window.location.replace(\"../../../../../../../index.html#alreadyFriendsPage\");<\script>");
-			response.end();
-		}
-	});
+		response.writeHead(200, {"Content-Type": "text/html"});
+		response.write("<script>window.location.replace(\"../../../../../../../../" + externalstring + "/" + current + "/" + toadd + "/makefriends?\");</script>");
+		response.end();
+		return;
+	}
+	else
+	{
+		console.log("Add denied: Friendship already exists...");
+		
+		response.writeHead(200, {"Content-Type": "text/html"});
+		response.write("<script>window.location.replace(\"../../../../../../../index.html#alreadyFriendsPage\");<\script>");
+		response.end();
+		return;
+	}
 }
 
 function getFriends(userid, response)
 {
 	var JSONfriends = [];
 	
-	connection.query("use rendezview");
-	connection.query("SELECT * FROM friends WHERE userid_a=\"" + userid + "\" OR userid_b=\"" + userid + "\";", function(err, rows, fields)
-	{
-		if(err)
-			console.log("SQL Error: " + err);
+	wait.forMethod(connection, 'query', "use rendezview");
+	var rows = wait.forMethod(connection, 'query', "SELECT * FROM friends WHERE userid_a=\"" + userid + "\" OR userid_b=\"" + userid + "\";");
 		
-		if(rows==null||rows==undefined)
-		{
-			//this guy's a loser...
-			return;
-		}
-		
-		for(var i=0;i<rows.length;i++)
-		{
-			var row = rows[0],
-				sid = row.userid_a;
-				
-			if(sid.localeCompare(userid)==0)
-				sid = row.userid_b;
-				
-			var obj = {"name":"","sid":sid,"status":row.confirmed}
-			JSONfriends.push(obj);
-		}
-	});
-	
-	for(var i=0;i<JSONfriends.length;i++)
+	if(rows==null||rows==undefined)
 	{
-		connection.query("SELECT * FROM users WHERE userid=\"" + JSONfriends[i].sid + "\";", function(err, rows, fields)
-		{
-			if(err)
-				console.log("SQL Error: " + err);
-			
-			if(rows==null||rows==undefined)
-				return;
-			
-			JSONfriends[i].name = rows[0].name;
-		});
+		//this guy's a loser...
+		console.log("User: " + userid + " has no friends!!! What a scrub!");
+		
+		response.writeHead(200, {"Content-Type": "text/html"});
+		response.write("<script>doFriendUpdate(\"" + JSON.stringify(JSONfriends) + "\");</script>");
+		response.end();
+		
+		return;
 	}
 	
-	var JSONtext = JSON.stringify(JSONfriends);
-	console.log("Printing friends for: " + userid);
-	console.log("\n................................\n");
-	console.log(JSONtext);
-	console.log("\n................................\n");
+	for(var i=0;i<rows.length;i++)
+	{
+		var sid = "";
+		sid = rows[i].userID_A;
+			
+		if(sid==userid)
+			sid = rows[i].userID_B;
+			
+		JSONfriends.push({"name":"","sid":sid,"status":rows[i].confirmed});
+	}
+
+	for(var i=0;i<JSONfriends.length;i++)
+	{
+		var rows = wait.forMethod(connection, 'query', "SELECT * FROM users WHERE userid=\"" + JSONfriends[i].sid + "\";");
+		
+		if(rows==null||rows==undefined)
+			return;
+		
+		JSONfriends[i].name = rows[0].name;
+	}
 	
 	response.writeHead(200, {"Content-Type": "text/html"});
-	response.write("<script>doFriendUpdate(\"" + JSONtext + "\");</script>");
+	response.write("<script>doFriendUpdate(\"" + JSON.stringify(JSONfriends) + "\");</script");
 	response.end();
 }
 
@@ -377,7 +368,7 @@ function validate(pathname, response)
 			else
 			{
 				response.writeHead(200, {"Content-Type": "text/html"});
-				response.write("<script>window.location.replace(\"" + externalip + "/" + name + "/makevalid?\");</script>");
+				response.write("<script>window.location.replace(\"" + externalstring + "/" + name + "/makevalid?\");</script>");
 				response.end();
 			}
 		}
@@ -452,7 +443,7 @@ function tryRegister(pathname, response)
 		else
 		{
 			response.writeHead(200, {"Content-Type": "text/html"});
-			response.write("<script>window.location.replace(\"" + externalip + "/" + sid + "/" + name + "/" + email + "/" + password + "/doreg?\");</script>");
+			response.write("<script>window.location.replace(\"" + externalstring + "/" + sid + "/" + name + "/" + email + "/" + password + "/doreg?\");</script>");
 			response.end();
 		}
 	});
@@ -499,7 +490,7 @@ function sendMail(name, email)
 			from: "rendezview.server@gmail.com",
 			to: email + "@my.bcit.ca",
 			subject: "Welcome to RendezView",
-			text: "Thank you for joining RendezView!\n\nYour registration is complete, you may now verify your account by clicking the following link:\n\n  " + externalip + ":" + httpport + "/" + name + "/validate?"
+			text: "Thank you for joining RendezView!\n\nYour registration is complete, you may now verify your account by clicking the following link:\n\n  " + externalstring + "/" + name + "/validate?"
 		}, function(error, response)
 		{
 			if(error)
