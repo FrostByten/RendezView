@@ -279,7 +279,7 @@ function getFriends(userid, response)
 		console.log("User: " + userid + " has no friends!!! What a scrub!");
 		
 		response.writeHead(200, {"Content-Type": "text/html"});
-		response.write("<script>doFriendUpdate(\"" + JSON.stringify(JSONfriends) + "\");</script>");
+		response.write("<script>window.location.replace(\"javascript:doFriendUpdate(\'" + JSON.stringify(JSONfriends) + "\')\");</script>");
 		response.end();
 		
 		return;
@@ -309,7 +309,7 @@ function getFriends(userid, response)
     console.log("Displaying JSON data to return: " + JSON.stringify(JSONfriends));
 	
 	response.writeHead(200, {"Content-Type": "text/html"});
-	response.write("<script>doFriendUpdate(\"" + JSON.stringify(JSONfriends) + "\");</script");
+	response.write("<script>window.location.replace(\"javascript:doFriendUpdate(\'" + JSON.stringify(JSONfriends) + "\')\");</script>");
 	response.end();
 }
 

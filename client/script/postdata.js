@@ -6,8 +6,9 @@ var socket = io.connect('http://162.156.5.173:84'),
 	friendlocation = "",
 	selectedscheduleday = "",
 	selectedscheduletime = "",
-	locations = [{"building":"SW5","rooms":[{"room":"1850","locid":"someval"},{"room":"1840","locid":"someval2"},{"room":"1822","locid":"someval3"}]},{"building":"SW5","rooms":[{"room":"1850","locid":"someval"}]}];
+	locations = [{"building":"SW5","rooms":[{"room":"1850","locid":"someval"},{"room":"1840","locid":"someval2"},{"room":"1822","locid":"someval3"}]},{"building":"SE2","rooms":[{"room":"1850","locid":"someval"}]}];
     
+$(document).ready(onReady());
 
 socket.on('noreg', function(data)
 {
@@ -29,9 +30,50 @@ socket.on('loginnotverified', function(data)
 	loginNotVerified();
 });
 
+function updateRooms(value)
+{
+	var list = [];
+	
+	$(".room").empty();
+	
+	for(var i=0;i<locations.length;i++)
+	{
+		if(locations[i].building==value)
+		{
+			for(var j=0;j<locations[i].rooms.length;j++)
+			{
+				list.push('<option value=\"' + locations[i].rooms[j].room + '\" id=\"' + locations[i].rooms[j].room + '\">' + locations[i].rooms[j].room + '</option>');
+			}
+		}
+	}
+	
+	$(".room").append(list.join(''));
+	$(".room").trigger("chosen:updated");
+	$(".room")[0].selectedIndex = 0;
+	$(".room").val($(".room option:first").val());
+}
+
+function updateLocationLists()
+{
+	var list = [];
+	
+	$(".building").empty();
+	$(".room").empty();
+	
+	for(var i=0;i<locations.length;i++)
+	{
+		list.push('<option value=\"' + locations[i].building + '\" id=\"' + locations[i].building + '\">' + locations[i].building + '</option>');
+	}
+	
+	$(".building").append(list.join(''));
+	$(".building").trigger("chosen:updated");
+	$(".building")[0].selectedIndex = 0;
+	$(".building").val($(".building option:first").val());
+}
+
 function onReady()
 {
-	//populate the update lists
+	updateLocationLists();
 }
 
 function noRegWindow()
