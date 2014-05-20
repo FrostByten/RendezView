@@ -49,7 +49,6 @@ function updateRooms(value)
 	
 	$(".room").append(list.join(''));
 	$(".room").trigger("chosen:updated");
-	$(".room")[0].selectedIndex = 0;
 	$(".room").val($(".room option:first").val());
 }
 
@@ -67,7 +66,6 @@ function updateLocationLists()
 	
 	$(".building").append(list.join(''));
 	$(".building").trigger("chosen:updated");
-	$(".building")[0].selectedIndex = 0;
 	$(".building").val($(".building option:first").val());
 }
 
@@ -149,12 +147,14 @@ function correctLogin()
 {
 	document.getElementById("incorrecttext").style.display = 'none';
 	window.name = document.getElementById("username").value;
-	window.location.replace(window.name + "/getfriends?");
+	updateLocationLists();
+	updateFriendsList();
 }
 
 function doFriendUpdate(JSONtext)
 {
-	//alert("dofriendupdatecalled");
+       
+	alert("dofriendupdatecalled");
 	var JSONfriends = JSON.parse(JSONtext),
 		list = [];
 	
@@ -196,7 +196,7 @@ function addBack(friendstring)
 
 function updateScheduleList(JSONtext)
 {
-	var JSONschedule = /*JSON.parse(JSONtext)*/[{"Day":"Wednesday","RoomID":"1850","BuildingID":"SW5","FromTime":"10:30 AM","ToTime":"1:30 PM"},{"Day":"Tuesday","RoomID":"1550","BuildingID":"NE1","FromTime":"8:00 AM","ToTime":"4:20 PM"},{"Day":"Saturday","RoomID":"Onnn","BuildingID":"Ononon","FromTime":"Break","ToTime":"Of Dawn"}],
+	var JSONschedule = JSON.parse(JSONtext);//[{"Day":"Wednesday","RoomID":"1850","BuildingID":"SW5","FromTime":"10:30 AM","ToTime":"1:30 PM"},{"Day":"Tuesday","RoomID":"1550","BuildingID":"NE1","FromTime":"8:00 AM","ToTime":"4:20 PM"},{"Day":"Saturday","RoomID":"Onnn","BuildingID":"Ononon","FromTime":"Break","ToTime":"Of Dawn"}],
 		list = [];
 	
 	$(".schedulelist").empty();

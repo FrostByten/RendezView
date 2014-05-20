@@ -15,16 +15,12 @@ var httpport = 84,
 	externalip = "162.156.5.173",
 	externalstring = externalip + ':' + httpport,
 	dbip = "localhost",
-	connection = db.createConnection({
-		host : dbip,
-		user : 'admin',
-		password : 'hype41',
-	});
+	connection;
 
 //-------------------Main------------------
 console.log("Starting HTTP Server on port: " + httpport);
 console.log("External connection address: http://" + externalstring + "/");
-connection.connect();
+refreshDBConnection();
 var server = http.createServer(onRequest).listen(httpport),
 	io = socketio.listen(server, {log: false}),
 	mail = nodemailer.createTransport("SMTP", {
@@ -36,6 +32,33 @@ var server = http.createServer(onRequest).listen(httpport),
 	});
 
 //-----------------Functions---------------
+function refreshDBConnection()
+{
+	connection = db.createConnection({
+		host : dbip,
+		user : 'admin',
+		password : 'hype41',
+	});
+	
+	connection.connect(function(err)
+	{
+        if(err)
+        {
+            console.log(err);
+            setTimeout(refreshDBConnection, 2000);
+        }
+	});
+	
+	connection.on('error', function(err)
+	{
+		console.log(err);
+		if(err,code === 'PROTOCOL_CONNECTION_LOST')
+			refreshDBConnection();
+		else
+			throw err();
+	});
+}
+
 function onRequest(request, response)
 {
 	if(request.method === "POST")
@@ -116,6 +139,7 @@ function serve(request, response)
 	}
 	if(pathname.search("getfriends?")!=-1)
 	{
+        console.log("getting friendsenschlitzen");
 		getFriends(list[1], response);
 		return;
 	}
@@ -271,8 +295,9 @@ function getFriends(userid, response)
 	var JSONfriends = [];
     
 	wait.forMethod(connection, 'query', "use rendezview");
+    console.log("here 1");
 	var rows = wait.forMethod(connection, 'query', "SELECT * FROM friends WHERE userid_a=\"" + userid + "\" OR userid_b=\"" + userid + "\";");
-    
+    console.log("here 2");
 	if(rows==null||rows==undefined||rows.length==0)
 	{
 		//this guy's a loser...
@@ -284,7 +309,7 @@ function getFriends(userid, response)
 		
 		return;
 	}
-    
+    console.log("here 3");
 	for(var i=0;i<rows.length;i++)
 	{
 		var sid = "";
@@ -295,22 +320,24 @@ function getFriends(userid, response)
 			
 		JSONfriends.push({"name":"","sid":sid,"status":rows[i].confirmed});
 	}
-
+    console.log("here 4");
 	for(var i=0;i<JSONfriends.length;i++)
 	{
+        console.log("Getting name of " + JSONfriends[i].sid);
 		var rows = wait.forMethod(connection, 'query', "SELECT * FROM users WHERE userid=\"" + JSONfriends[i].sid + "\";");
 		
 		if(JSON.stringify(rows[0])=="[]"||rows==undefined||rows[0]==undefined)
-			return;
+			break;
 		
 		JSONfriends[i].name = rows[0].name;
 	}
-    
+    console.log("here 5");
     console.log("Displaying JSON data to return: " + JSON.stringify(JSONfriends));
 	
 	response.writeHead(200, {"Content-Type": "text/html"});
-	response.write("<script>window.location.replace(\"javascript:doFriendUpdate(\'" + JSON.stringify(JSONfriends) + "\')\");</script>");
+	response.write("<script>window.location.replace(\'../../../../../index.html#friendsPage\'); doFriendUpdate(\'" + JSON.stringify(JSONfriends) + "\'); alert(\'called dat shiat\');</script>");
 	response.end();
+    console.log("here 6");
 }
 
 function makeValid(name, response)
