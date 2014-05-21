@@ -52,7 +52,7 @@ function refreshDBConnection()
 	connection.on('error', function(err)
 	{
 		console.log(err);
-		if(err,code === 'PROTOCOL_CONNECTION_LOST')
+		if(err.code === 'PROTOCOL_CONNECTION_LOST')
 			refreshDBConnection();
 		else
 			console.log(err);
