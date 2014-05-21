@@ -133,7 +133,7 @@
 						</a>
 					</div>
 					<div class="ui-block-b">
-						<a href="#friendsPage" data-role="button" class="friends-btn" data-transition="slide">
+						<a href="javascript:gotoFriends();" data-role="button" class="friends-btn" data-transition="slide">
 							<img src="images/friends.png" width="53%">
 							<br />Friends
 						</a>
@@ -384,7 +384,7 @@
 		
 		<div id="addFriendPage" data-role="page">
 			<div data-role="header" data-position="fixed">
-				<a href="#friendsPage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="back">Back</a>
+				<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse" data-icon="back">Back</a>
 				<h1>Add Friend</h1>
 				<a href="javascript:addFriend();" data-role="button" data-transition="pop" data-direction="reverse" data-icon="check">Confirm</a>
 			</div>
@@ -492,7 +492,7 @@
 				</strong>
 				<a href="javascript:addFriendBack();" data-role="button" data-theme="c">Approve</a>
 				<a href="javascript:denyFriend();" data-role="button" data-theme="b">Deny</a>
-				<a href="#friendsPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
 			</div>
 		</div>
 		
@@ -504,7 +504,7 @@
 				You have friended this user, however they have not yet friended you back.<br />
 				This user needs to add you to their friends list before you can see their location.<br />
 				<br /></strong>
-				<a href="#friendsPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
 			</div>
 		</div>
 		
@@ -516,7 +516,7 @@
 				You have attempted to friend a user that does not exist.<br />
 				Check the Student ID, and make sure that this person has a RendezView account<br />
 				<br /></strong>
-				<a href="#friendsPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
 			</div>
 		</div>
 		
@@ -528,7 +528,7 @@
 				You have attempted to add yourself as a friend.
 				Are you lonely? Well, too bad. You can't do that.
 				<br /></strong>
-				<a href="#friendsPage" data-role="button" data-transition="pop" data-direction="reverse">:(</a>
+				<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">:(</a>
 			</div>
 		</div>
 		
@@ -540,7 +540,7 @@
 				You have attempted to friend a user that is already your friend.<br />
 				<br />
 				</strong>
-				<a href="#friendsPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
 			</div>
 		</div>
 		
@@ -551,11 +551,40 @@
 				<strong><h1>Friend Location</h1><br />
 				<h3><span id="friendlocation"></span></h3>
 				</strong><br />
-				<a href="#friendsPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
 			</div>
 		</div>
 			
 			
 			
+        <div id="friendConfirmedPage" data-role="page">
+			<div data-role="content">
+				<strong><h1>Friendship Confirmed</h1><br />
+				Your friendship to this user has been confirmed.<br />
+				</strong><br />
+				<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+			</div>
+		</div>
+        
+        
+        
+        <div id="friendDeletedPage" data-role="page">
+			<div data-role="content">
+				<strong><h1>Friendship Removed</h1><br />
+				Your friendship to this user has been removed.<br />
+				</strong><br />
+				<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+			</div>
+		</div>
+        
+        <div id="friendMadePage" data-role="page">
+			<div data-role="content">
+				<strong><h1>Friendship Added</h1><br />
+				Your friendship to this user has been created.<br />
+				</strong><br />
+				<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+			</div>
+		</div>
+
 	</body>
 </html>

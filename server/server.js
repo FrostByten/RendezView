@@ -55,16 +55,22 @@ function refreshDBConnection()
 		if(err,code === 'PROTOCOL_CONNECTION_LOST')
 			refreshDBConnection();
 		else
-			throw err();
+			console.log(err);
 	});
 }
 
 function onRequest(request, response)
 {
 	if(request.method === "POST")
-		parseJSON(request, response);
+		wait.launchFiber(servePost, request, response);
 	else //request method is GET or HEAD
 		wait.launchFiber(serve, request, response);
+}
+
+function servePost(request, response)
+{
+	var path = url.parse(request.url).pathname;
+	console.log("received post request: " + path);
 }
 
 function parseJSON(request, response)
@@ -158,6 +164,17 @@ function serve(request, response)
 		locateFriend(list[2], response);
 		return;
 	}
+	if(pathname.search("getajaxfriends?")!=-1)
+	{
+        console.log(pathname);
+		getFriends(list[2], response);
+		return;
+	}
+    if(pathname.search("ketchups?")!=-1)
+    {
+        console.log("VAT?");
+        return;
+    }
 	
 	fs.exists(filename, function(exists)
 	{
@@ -189,7 +206,7 @@ function makefriends(current, toadd, response)
 	});
 	
 	response.writeHead(200, {"Content-Type": "text/html"});
-	response.write("<script>window.location.replace(\"../../../../../index.html#friendsPage\");</script>");
+	response.write("<script>window.location.replace(\"../../../../../index.html#friendMadePage\");</script>");
 	response.end();
 }
 
@@ -211,13 +228,13 @@ function confirmFriend(current, toadd, response)
 	connection.query("UPDATE friends SET confirmed=1 WHERE userid_a=\"" + toadd + "\" AND userid_b=\"" + current + "\";");
 	
 	response.writeHead(200, {"Content-Type": "text/html"});
-	response.write("<script>window.location.replace(\"../../../../../../../../index.html#friendsPage\");</script>");
+	response.write("<script>window.location.replace(\"../../../../../../../../index.html#friendConfirmedPage\");</script>");
 	response.end();
 }
 
 function deleteFriend(current, todelete, response)
 {
-	console.log("DELETE FRIEND request recieved");
+	console.log("DELETE FRIEND request received");
 	console.log(current + " wants to remove " + todelete + " as a friend");
 	console.log("Deletion Approved...");
 	
@@ -226,7 +243,7 @@ function deleteFriend(current, todelete, response)
 	connection.query("DELETE FROM friends WHERE userid_a = \"" + todelete + "\" AND userid_b = \"" + current + "\";");
 	
 	response.writeHead(200, {"Content-Type": "text/html"});
-	response.write("<script>window.location.replace(\"../../../../../../../../../../../index.html#friendsPage\");</script>");
+	response.write("<script>window.location.replace(\"../../../../../../../../../../../index.html#friendDeletedPage\");</script>");
 	response.end();
 }
 
@@ -284,7 +301,7 @@ function addFriend(current, toadd, response)
 		console.log("Add denied: Friendship already exists...");
 		
 		response.writeHead(200, {"Content-Type": "text/html"});
-		response.write("<script>window.location.replace(\"../../../../../../../index.html#alreadyFriendsPage\");<\script>");
+		response.write("<script>window.location.replace(\'../../../../../../../index.html#alreadyFriendsPage\');</script>");
 		response.end();
 		return;
 	}
@@ -295,9 +312,9 @@ function getFriends(userid, response)
 	var JSONfriends = [];
     
 	wait.forMethod(connection, 'query', "use rendezview");
-    console.log("here 1");
+
 	var rows = wait.forMethod(connection, 'query', "SELECT * FROM friends WHERE userid_a=\"" + userid + "\" OR userid_b=\"" + userid + "\";");
-    console.log("here 2");
+
 	if(rows==null||rows==undefined||rows.length==0)
 	{
 		//this guy's a loser...
@@ -309,7 +326,6 @@ function getFriends(userid, response)
 		
 		return;
 	}
-    console.log("here 3");
 	for(var i=0;i<rows.length;i++)
 	{
 		var sid = "";
@@ -318,26 +334,30 @@ function getFriends(userid, response)
 		if(sid==userid)
 			sid = rows[i].userID_B;
 			
-		JSONfriends.push({"name":"","sid":sid,"status":rows[i].confirmed});
+		JSONfriends.push({"name":"","sid":sid,"status":"confirmed"});
+        if(rows[i].confirmed==0)
+        {
+            var rows2 = wait.forMethod(connection, 'query', "SELECT * FROM friends WHERE userid_a = \"" + userid + "\" AND userid_b = \"" + JSONfriends[i].sid + "\";");
+            if(rows2==null||rows2==undefined||rows2.length==0)
+                JSONfriends[i].status = "pendingb";
+            else
+                JSONfriends[i].status = "pendinga";
+        }
 	}
-    console.log("here 4");
 	for(var i=0;i<JSONfriends.length;i++)
 	{
         console.log("Getting name of " + JSONfriends[i].sid);
 		var rows = wait.forMethod(connection, 'query', "SELECT * FROM users WHERE userid=\"" + JSONfriends[i].sid + "\";");
 		
 		if(JSON.stringify(rows[0])=="[]"||rows==undefined||rows[0]==undefined)
-			break;
-		
-		JSONfriends[i].name = rows[0].name;
+			JSONfriends[i].name = "Unnamed...";
+		else
+            JSONfriends[i].name = unescape(rows[0].name);
 	}
-    console.log("here 5");
     console.log("Displaying JSON data to return: " + JSON.stringify(JSONfriends));
 	
-	response.writeHead(200, {"Content-Type": "text/html"});
-	response.write("<script>window.location.replace(\'../../../../../index.html#friendsPage\'); doFriendUpdate(\'" + JSON.stringify(JSONfriends) + "\'); alert(\'called dat shiat\');</script>");
-	response.end();
-    console.log("here 6");
+	response.writeHead(200, {"Content-Type": "application/json"});
+	response.end(JSON.stringify(JSONfriends));
 }
 
 function makeValid(name, response)

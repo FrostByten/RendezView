@@ -1,34 +1,14 @@
-var socket = io.connect('http://162.156.5.173:84'),
-	usersid = "",
+var usersid = "",
 	friendsettingsid = "",
 	friendaddid = "",
 	schedulesettingsid = "",
 	friendlocation = "",
 	selectedscheduleday = "",
 	selectedscheduletime = "",
+	ipstring = "162.156.5.173:84",
 	locations = [{"building":"SW5","rooms":[{"room":"1850","locid":"someval"},{"room":"1840","locid":"someval2"},{"room":"1822","locid":"someval3"}]},{"building":"SE2","rooms":[{"room":"1850","locid":"someval"}]}];
     
 $(document).ready(onReady());
-
-socket.on('noreg', function(data)
-{
-	noRegWindow();
-});
-
-socket.on('logincorrect', function(data)
-{
-	correctLogin();
-});
-
-socket.on('loginincorrect', function(data)
-{
-	incorrectLogin();
-});
-
-socket.on('loginnotverified', function(data)
-{
-	loginNotVerified();
-});
 
 function updateRooms(value)
 {
@@ -153,8 +133,6 @@ function correctLogin()
 
 function doFriendUpdate(JSONtext)
 {
-       
-	alert("dofriendupdatecalled");
 	var JSONfriends = JSON.parse(JSONtext),
 		list = [];
 	
@@ -185,13 +163,22 @@ function doFriendUpdate(JSONtext)
 
 function updateFriendsList()
 {
-	window.location.replace(window.name + "/getfriends?");
+	$.getJSON("/" + ipstring + "/" + window.name + "/getajaxfriends?", function(data)
+    {
+        doFriendUpdate(JSON.stringify(data));
+    });
 }
 
 function addBack(friendstring)
 {
 	friendaddid = friendstring;
 	window.location.replace("#addBackPage");
+}
+
+function backToFriends()
+{
+    updateFriendsList();
+	window.location.replace("../../../../../index.html#friendsPage");
 }
 
 function updateScheduleList(JSONtext)
@@ -222,6 +209,12 @@ function scheduleSettingsMenu(day, fromtime)
 function deleteSchedule()
 {
 
+}
+
+function gotoFriends()
+{
+    updateFriendsList();
+    window.location.replace("#friendsPage");
 }
 
 function login(dervar)
@@ -265,7 +258,6 @@ function friendSettingMenu(userstring)
 function denyFriend()
 {
 	window.location.replace(window.name + "/" + friendaddid + "/deletefriend?");
-	updateFriendsList();
 }
 
 function locateFriend(friendid)
