@@ -175,6 +175,11 @@ function serve(request, response)
         console.log("VAT?");
         return;
     }
+	if(pathname.search("getajaxrooms?")!=-1)
+	{
+		getRooms(response);
+		return;
+	}
 	
 	fs.exists(filename, function(exists)
 	{
@@ -540,15 +545,31 @@ function sendMail(name, email)
 		});
 }
 
-io.sockets.on('connection', function(socket)
+function getRooms(response)
 {
-	var address = socket.handshake.address;
-});
+	var JSONrooms = [];
+    
+	wait.forMethod(connection, 'query', "use rendezview");
 
-io.sockets.on('disconnect', function(socket)
-{
-	var address = socket.handshake.address;
-});
+	var rows = wait.forMethod(connection, 'query', "SELECT DISTINCT buildingID FROM location;");
+
+	for(var i=0;i<rows.length;i++)
+	{
+		var building = {"name":rows[i].buildingID,"rooms":[]},
+			rows2 = wait.forMethod(connection, 'query', "SELECT * FROM locations WHERE buildingID=\'" + rows[i].buildingID + "\';");
+		
+		for(var j=0;j<rows2.length;j++)
+		{
+			building.rooms.push({"roomID":rows2[j].roomID,"locationID":rows2[j].locationID});
+		}
+		
+		JSONrooms.push(building);
+	}
+	
+	console.log("JSON Object for Rooms: " + JSON.stringify(JSONrooms));
+	response.writeHead(200, {"Content-Type": "application/json"});
+	response.end(JSON.stringify(JSONrooms));
+}
 
 function SQLError(err)
 {

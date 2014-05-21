@@ -6,7 +6,7 @@ var usersid = "",
 	selectedscheduleday = "",
 	selectedscheduletime = "",
 	ipstring = "162.156.5.173:84",
-	locations = [{"building":"SW5","rooms":[{"room":"1850","locid":"someval"},{"room":"1840","locid":"someval2"},{"room":"1822","locid":"someval3"}]},{"building":"SE2","rooms":[{"room":"1850","locid":"someval"}]}];
+	locations = [];
     
 $(document).ready(onReady());
 
@@ -18,11 +18,11 @@ function updateRooms(value)
 	
 	for(var i=0;i<locations.length;i++)
 	{
-		if(locations[i].building==value)
+		if(locations[i].name==value)
 		{
 			for(var j=0;j<locations[i].rooms.length;j++)
 			{
-				list.push('<option value=\"' + locations[i].rooms[j].room + '\" id=\"' + locations[i].rooms[j].room + '\">' + locations[i].rooms[j].room + '</option>');
+				list.push('<option value=\"' + locations[i].rooms[j].locationID + '\" id=\"' + locations[i].rooms[j].locationID + '\">' + locations[i].rooms[j].roomID + '</option>');
 			}
 		}
 	}
@@ -32,16 +32,26 @@ function updateRooms(value)
 	$(".room").val($(".room option:first").val());
 }
 
-function updateLocationLists()
+function updateLists()
+{
+	$.getJSON("/" + ipstring + "/getajaxrooms?", function(data)
+    {
+        updateLocationLists(JSON.stringify(data));
+    });
+}
+
+function updateLocationLists(data)
 {
 	var list = [];
+	
+	locations = JSON.parse(data);
 	
 	$(".building").empty();
 	$(".room").empty();
 	
 	for(var i=0;i<locations.length;i++)
 	{
-		list.push('<option value=\"' + locations[i].building + '\" id=\"' + locations[i].building + '\">' + locations[i].building + '</option>');
+		list.push('<option value=\"' + locations[i].name + '\" id=\"' + locations[i].name + '\">' + locations[i].name + '</option>');
 	}
 	
 	$(".building").append(list.join(''));
@@ -51,7 +61,7 @@ function updateLocationLists()
 
 function onReady()
 {
-	updateLocationLists();
+	updateLists();
 }
 
 function noRegWindow()
