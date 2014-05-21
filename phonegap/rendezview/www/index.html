@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>RendezView</title>
+		
+		<link href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.css" rel="stylesheet" />
+		<link href="http://code.jquery.com/mobile/1.4.2/jquery.mobile.structure-1.4.2.min.css" rel="stylesheet" />
+		<link href="style/buttons.css" rel="stylesheet" />
+		<link href="style/themes/group23.css" rel="stylesheet" />
+		<link href="style/themes/jquery.mobile.icons.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/index.css" />
+		
+		<link href="/favicon.ico" rel="SHORTCUT ICON" />
+		
+		<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+		
+		<script src="script/socketio/socket.io.js"></script>
+		<script src="script/hash.js"></script>
+		<script src="script/postdata.js"></script>
+	</head>
+	<body>
+		<script type="text/javascript" src="phonegap.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript">
+            app.initialize();
+        </script>
+	
+	
+		<div class="app">
+			<div id="loginPage" data-role="page">
+				<div data-role="header" data-position="fixed">
+					<h1>RendezView - Login</h1>
+				</div>
+				<div data-role="content">
+					<div style="text-align:center;">
+						<img src="images/logo.png" style="" width="96%">
+					</div>
+					<div id="incorrecttext" style="display: none; color: #FF0000"><strong>Incorrect username or password</strong></div>
+					<div data-role="fieldcontain">
+						<label for="username">Student ID:</label>
+						<input type="text" name="username" id="username" value="" />
+					</div>
+					<div data-role="fieldcontain">
+						<label for="password">Password:</label>
+						<input type="password" name="passwordlog" id="passwordlog" value="" />
+					</div>
+					<fieldset class="ui-grid-a">
+						<div class="ui-block-a">
+							<a href="#registerPage" data-role="button" data-transition="flip">Register</a>
+						</div>
+						<div class="ui-block-b">
+						<a href="javascript:tryLogin()" data-role="button" data-transition="flow">Login</a>
+						</div>
+					</fieldset>
+				</div>
+				<div data-role="footer" data-position="fixed"></div>
+			</div>
+			
+			
+			
+			<div id="registerPage" data-role="page">
+				<div data-role="header" data-position="fixed">
+					<a href="#loginPage" data-role="button" data-transition="flip" data-direction="reverse" data-icon="back">Back</a>
+					<h1>Registration</h1>
+				</div>
+				<div data-role="content">
+					<div data-role="fieldcontain">
+						<label for="name">Name:</label>
+						<input type="text" name="name" id="name" value="John Doe" />
+					</div>
+					<div data-role="fieldcontain">
+						<label for="sid">Student ID:</label>
+						<input type="text" name="sid" id="sid" value="A00123456" />
+					</div>
+					<div data-role="fieldcontain">
+						<label for="email">Email:</label>
+						<div class="ui-grid-a">
+							<div class="ui-block-a" style="width:80%;">
+								<input type="email" name="email" id="email" value="" />
+							</div>
+							<div class="ui-block-b" style="width:20%;">
+								<br />&nbsp;@my.bcit.ca
+							</div>
+						</div>
+						
+					</div>
+					<div data-role="fieldcontain">
+						<label for="password">Password:</label>
+						<input type="password" name="password" id="password" value="" />
+					</div>
+					<div data-role="fieldcontain">
+						<label for="passconf">Confirm Password:</label>
+						<input type="password" name="passconf" id="passconf" value="" />
+					</div>
+					<a href="javascript:sendReg()" data-role="button" data-icon="check">Submit</a>
+				</div>
+			</div>
+				
+				
+				
+			<div id="friendsPage" data-role="page">
+				<div data-role="header" data-position="fixed">
+					<a href="#mainPage" data-role="button" data-transition="slide" data-direction="reverse" data-icon="back">Back</a>
+					<h1>Friends</h1>
+					<a href="#addFriendPage" data-role="button" data-rel="dialog" data-transition="pop" data-icon="plus">Add</a>
+				</div>
+				<div data-role="content">
+					<div data-role="fieldcontain">
+						<form class="ui-filterable">
+							<input data-type="search" name="friendsFilter" id="friendsFilter" />
+						</form>
+					</div>
+					<ul id="friendsList" class="friendslist" data-role="listview" data-split-icon="gear" data-filter="true" data-input="#friendsFilter">
+						<li></li>
+					</ul>
+				</div>
+				<div data-role="footer" data-position-"fixed"></div>
+			</div>
+			
+			
+			
+			<div id="mainPage" data-role="page">
+				<div data-role="header" data-position="fixed">
+					<h1>RendezView</h1>
+				</div>
+				<div data-role="content">
+					<div style="text-align:center;">
+						<img src="images/logo.png" style="" width="96%">
+					</div>
+					<fieldset class="ui-grid-a">
+						<div class="ui-block-a">
+							<a href="#updatePage" data-role="button" class="update-btn" data-transition="slide">
+								<img src="images/update.png" width="53%">
+								<br />Update
+							</a>
+							<a href="#schedulePage" data-role="button" class="schedule-btn" data-transition="slide">
+								<img src="images/schedule.png" width="53%">
+								<br />Schedule
+							</a>
+						</div>
+						<div class="ui-block-b">
+							<a href="javascript:gotoFriends();" data-role="button" class="friends-btn" data-transition="slide">
+								<img src="images/friends.png" width="53%">
+								<br />Friends
+							</a>
+							<a href="javascript:logout()" data-role="button" class="logout-btn" data-transition="flow" data-direction="reverse">
+								<img src="images/logout.png" width="53%">
+								<br />Logout
+							</a>
+						</div>
+					</fieldset>
+				</div>
+				<div data-role="footer" data-position-"fixed">
+					<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Ffacebook.com%2Fletsrendezview&amp;width=100&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;share=true&amp;height=21" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:95px; height:21px; display:block; margin: 0 auto;" allowTransparency="true"></iframe>
+				</div>
+			</div>
+			
+			
+			
+			<div id="updatePage" data-role="page">
+				<div data-role="header" data-position="fixed">
+					<a href="#mainPage" data-role="button" data-transition="slide" data-direction="reverse" data-icon="back">Back</a>
+					<h1>Update</h1>
+					<a href="#mainPage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="check">Commit</a>
+				</div>
+				<div data-role="content">
+					<div id="inset" name="inset" style="background-color:#4B4B4B;border-style:ridge;border-color:#6B6B6B;border-width:3px;padding:15px;">
+						<div class="ui-grid-a">
+							<div class="ui-block-a" style="padding:5px;">
+								<label>Current location: </label>
+								<strong>Lorum ipsum dolar sit amet</strong>
+							</div>
+							<div class="ui-block-b" style="padding:5px;">
+								<label>Until: </label>
+								<strong>Lorum ipsum dolar sit amet</strong>
+							</div>
+						</div>
+					</div>
+					<br />
+					<label for="location">New Location:</label>
+					<div class="ui-grid-a">
+						<div class="ui-block-a">
+							<select name="building" id="building" class="building" onChange="updateRooms(this.value);">
+								<option value="huehue">Building 1</option>
+								<option value="jaja">Building 2</option>
+								<option value="brazilia">Building 3</option>
+							</select>
+						</div>
+						<div class="ui-block-b">
+							<select name="room" id="room" class="room">
+								<option value="1">Room 1</option>
+								<option value="2">Room 2</option>
+								<option value="3">Room 3</option>
+							</select>
+						</div>
+					</div>
+					<label for="until">Until:</label>
+					<div class="ui-grid-b" name="until" id="until">
+						<div class="ui-block-a">
+							<select name="hour" id="hour">
+								<option value="1">01</option>
+								<option value="2">02</option>
+								<option value="3">03</option>
+								<option value="4">04</option>
+								<option value="5">05</option>
+								<option value="6">06</option>
+								<option value="7">07</option>
+								<option value="8">08</option>
+								<option value="9">09</option>
+								<option value="10">10</option>
+								<option value="11">11</option>
+								<option value="12">12</option>
+							</select>
+						</div>
+						<div class="ui-block-b">
+							<select name="minute" id="minute">
+								<option value="0">:00</option>
+								<option value="5">:05</option>
+								<option value="10">:10</option>
+								<option value="15">:15</option>
+								<option value="20">:20</option>
+								<option value="25">:25</option>
+								<option value="30">:30</option>
+								<option value="35">:35</option>
+								<option value="40">:40</option>
+								<option value="45">:45</option>
+								<option value="50">:50</option>
+								<option value="55">:55</option>
+							</select>
+						</div>
+						<div class="ui-block-c">
+							<select name="pm" id="pm" data-role="slider" data-mini="false">
+								<option value="am">AM</option>
+								<option value="pm">PM</option>
+							</select>
+						</div>
+					</div>
+					
+				</div>
+				<div data-role="footer" data-position-"fixed"></div>
+			</div>
+			
+			
+			
+			<div id="schedulePage" data-role="page">
+				<div data-role="header" data-position="fixed">
+					<a href="#mainPage" data-role="button" data-transition="slide" data-direction="reverse" data-icon="back">Back</a>
+					<h1>Schedule</h1>
+					<a href="#addSchedulePage" data-role="button" data-rel="dialog" data-transition="pop" data-icon="plus">Add</a>
+				</div>
+				<div data-role="content">
+					<div data-role="fieldcontain">
+						<form class="ui-filterable">
+							<input data-type="search" name="scheduleFilter" id="scheduleFilter" />
+						</form>
+					</div>
+					<ul id="scheduleList" class="schedulelist" data-role="listview" data-split-icon="gear" data-filter="true" data-input="#scheduleFilter">
+						<li></li>
+					</ul>
+				</div>
+			</div>
+			
+			
+			
+			<div id="addSchedulePage" data-role="page">
+				<div data-role="header" data-position="fixed">
+					<a href="#schedulePage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="back">Back</a>
+					<h1>Add Scheduled Event</h1>
+					<a href="#schedulePage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="check">Confirm</a>
+				</div>
+				<div data-role="content">
+					<div data-role="fieldcontain">
+						<label for="every" class="select"><strong>Every:</strong></label>
+						<select name="every" id="every">
+							<option value="monday">Monday</option>
+							<option value="tuesday">Tuesday</option>
+							<option value="wednesday">Wednesday</option>
+							<option value="thursday">Thursday</option>
+							<option value="friday">Friday</option>
+							<option value="saturday">Saturday</option>
+							<option value="sunday">Sunday</option>
+						</select>
+					</div>
+					
+					<label for="from"><strong>From:</strong></label>
+					<div class="ui-grid-b" name="from" id="from">
+						<div class="ui-block-a">
+							<select name="fromhour" id="fromhour">
+								<option value="1">01</option>
+								<option value="2">02</option>
+								<option value="3">03</option>
+								<option value="4">04</option>
+								<option value="5">05</option>
+								<option value="6">06</option>
+								<option value="7">07</option>
+								<option value="8">08</option>
+								<option value="9">09</option>
+								<option value="10">10</option>
+								<option value="11">11</option>
+								<option value="12">12</option>
+							</select>
+						</div>
+						<div class="ui-block-b">
+							<select name="fromminute" id="fromminute">
+								<option value="0">:00</option>
+								<option value="5">:05</option>
+								<option value="10">:10</option>
+								<option value="15">:15</option>
+								<option value="20">:20</option>
+								<option value="25">:25</option>
+								<option value="30">:30</option>
+								<option value="35">:35</option>
+								<option value="40">:40</option>
+								<option value="45">:45</option>
+								<option value="50">:50</option>
+								<option value="55">:55</option>
+							</select>
+						</div>
+						<div class="ui-block-c">
+							<select name="frompm" id="frompm" data-role="slider" data-mini="false">
+								<option value="am">AM</option>
+								<option value="pm">PM</option>
+							</select>
+						</div>
+					</div>
+					
+					<label><strong>To:</strong></label>
+					<div class="ui-grid-b" name="to" id="to">
+						<div class="ui-block-a">
+							<select name="tohour" id="tohour">
+								<option value="1">01</option>
+								<option value="2">02</option>
+								<option value="3">03</option>
+								<option value="4">04</option>
+								<option value="5">05</option>
+								<option value="6">06</option>
+								<option value="7">07</option>
+								<option value="8">08</option>
+								<option value="9">09</option>
+								<option value="10">10</option>
+								<option value="11">11</option>
+								<option value="12">12</option>
+							</select>
+						</div>
+						<div class="ui-block-b">
+							<select name="tominute" id="tominute">
+								<option value="0">:00</option>
+								<option value="5">:05</option>
+								<option value="10">:10</option>
+								<option value="15">:15</option>
+								<option value="20">:20</option>
+								<option value="25">:25</option>
+								<option value="30">:30</option>
+								<option value="35">:35</option>
+								<option value="40">:40</option>
+								<option value="45">:45</option>
+								<option value="50">:50</option>
+								<option value="55">:55</option>
+							</select>
+						</div>
+						<div class="ui-block-c">
+							<select name="topm" id="topm" data-role="slider" data-mini="false">
+								<option value="am">AM</option>
+								<option value="pm">PM</option>
+							</select>
+						</div>
+					</div>
+					
+					<label for="location"><strong>Location:</strong></label>
+					<div class="ui-grid-a" name="location" id="location">
+						<div class="ui-block-a">
+							<select name="building" id="building" class="building">
+								<option value="1">Building 1</option>
+								<option value="2">Building 2</option>
+								<option value="3">Building 3</option>
+							</select>
+						</div>
+						<div class="ui-block-b">
+							<select name="room" id="room" class="room">
+								<option value="1">Room 1</option>
+								<option value="2">Room 2</option>
+								<option value="3">Room 3</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			
+			
+			<div id="addFriendPage" data-role="page">
+				<div data-role="header" data-position="fixed">
+					<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse" data-icon="back">Back</a>
+					<h1>Add Friend</h1>
+					<a href="javascript:addFriend();" data-role="button" data-transition="pop" data-direction="reverse" data-icon="check">Confirm</a>
+				</div>
+				<div data-role="content">
+					<label for="searchsid"><strong>Enter Student ID:</strong></label>
+					<input type="text" name="searchsid" id="searchsid" value="A00123456" />
+				</div>
+			</div>
+			
+			
+
+			<div id="settingFriendPage" data-role="page">
+				<div data-role="content">
+					<a href="javascript:deleteFriend();" data-role="button" data-theme="b">Delete</a>
+					<a href="#friendsPage" data-role="button">Cancel</a>
+				</div>
+			</div>
+			
+			
+			
+			<div id="settingSchedulePage" data-role="page">
+				<div data-role="content">
+					<a href="javascript:deleteSchedule();" data-role="button" data-theme="b">Delete</a>
+					<a href="#schedulePage" data-role="button">Cancel</a>
+				</div>
+			</div>
+			
+			
+			
+			<div id="regConfirmPage" data-role="page">
+				<div data-role="content">
+					<strong><h1>Thank you!</h1><br />
+					Your information has been sent to the RendezView Network.<br />
+					You will soon receive an email with a confirmation link.<br />
+					Please click it to activate your account.</strong>
+					<a href="#loginPage" data-role="button" data-transition="pop" data-direction="reverse">OK</a>
+				</div>
+			</div>
+			
+			
+			
+			<div id="loginNotVerified" data-role="page">
+				<div data-role="content">
+					<strong><h1>Account Activation Required</h1><br />
+					Sorry, your account has not been activated yet.<br />
+					Please follow the link in the email to confirm activation.<br />
+					<br />
+					If you did not receive the email, click the button below.</strong><br />
+					<a href="javascript:resendEmail()" data-role="button" data-theme="b">Re-send email</a>
+					<a href="#loginPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				</div>
+			</div>
+			
+			
+			
+			<div id="loginIncorrect" data-role="page">
+				<div data-role="content">
+					<strong><h1>Login Incorrect</h1><br />
+					Sorry, your username or password are incorrect.<br />
+					If you do not have an account, press 'register' on the login screen<br /></strong><br />
+					<a href="#loginPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				</div>
+			</div>
+			
+			
+			
+			<div id="noConfirm" data-role="page">
+				<div data-role="content">
+					<strong><h1>Password Incorrect</h1><br />
+					Password and password confirm fields do not match!
+					</strong><br />
+					<a href="#registerPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				</div>
+			</div>
+			
+			
+			
+			<div id="noReg" data-role="page">
+				<div data-role="content">
+					<strong><h1>Registration Incorrect</h1><br />
+					Sorry, that registration information is invalid, please try again.
+					</strong><br />
+					<a href="#registerPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				</div>
+			</div>
+			
+			
+			<div id="emailValidated" data-role="page">
+				<div data-role="content">
+					<strong><h1>Email Validated</h1><br />
+					Your account has been validated, you may now log in.
+					</strong><br />
+					<a href="#loginPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				</div>
+			</div>
+			
+			
+			
+			<div id="addBackPage" data-role="page">
+				<div data-role="content">
+					<strong><h1>Add Friend Back</h1></strong><br />
+					This person has added you to their friends list.<br />
+					You can confirm your friendship by pressing the button below.<br />
+					<br />
+					</strong>
+					<a href="javascript:addFriendBack();" data-role="button" data-theme="c">Approve</a>
+					<a href="javascript:denyFriend();" data-role="button" data-theme="b">Deny</a>
+					<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				</div>
+			</div>
+			
+			
+			
+			<div id="waitConfirmPage" data-role="page">
+				<div data-role="content">
+					<strong><h1>Friendship not confirmed</h1><br />
+					You have friended this user, however they have not yet friended you back.<br />
+					This user needs to add you to their friends list before you can see their location.<br />
+					<br /></strong>
+					<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				</div>
+			</div>
+			
+			
+			
+			<div id="friendNotExistPage" data-role="page">
+				<div data-role="content">
+					<strong><h1>User does not exist</h1><br />
+					You have attempted to friend a user that does not exist.<br />
+					Check the Student ID, and make sure that this person has a RendezView account<br />
+					<br /></strong>
+					<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				</div>
+			</div>
+			
+			
+			
+			<div id="friendNotSelfPage" data-role="page">
+				<div data-role="content">
+					<strong><h1>What? Don't have any friends?</h1><br />
+					You have attempted to add yourself as a friend.
+					Are you lonely? Well, too bad. You can't do that.
+					<br /></strong>
+					<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">:(</a>
+				</div>
+			</div>
+			
+			
+			
+			<div id="alreadyFriendsPage" data-role="page">
+				<div data-role="content">
+					<strong><h1>User already friended</h1><br />
+					You have attempted to friend a user that is already your friend.<br />
+					<br />
+					</strong>
+					<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				</div>
+			</div>
+			
+			
+			
+			<div id="friendLocationPage" data-role="page">
+				<div data-role="content">
+					<strong><h1>Friend Location</h1><br />
+					<h3><span id="friendlocation"></span></h3>
+					</strong><br />
+					<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				</div>
+			</div>
+				
+				
+				
+			<div id="friendConfirmedPage" data-role="page">
+				<div data-role="content">
+					<strong><h1>Friendship Confirmed</h1><br />
+					Your friendship to this user has been confirmed.<br />
+					</strong><br />
+					<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				</div>
+			</div>
+			
+			
+			
+			<div id="friendDeletedPage" data-role="page">
+				<div data-role="content">
+					<strong><h1>Friendship Removed</h1><br />
+					Your friendship to this user has been removed.<br />
+					</strong><br />
+					<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				</div>
+			</div>
+			
+			<div id="friendMadePage" data-role="page">
+				<div data-role="content">
+					<strong><h1>Friendship Added</h1><br />
+					Your friendship to this user has been created.<br />
+					</strong><br />
+					<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

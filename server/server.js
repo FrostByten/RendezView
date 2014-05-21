@@ -556,7 +556,7 @@ function getRooms(response)
 	for(var i=0;i<rows.length;i++)
 	{
 		var building = {"name":rows[i].buildingID,"rooms":[]},
-			rows2 = wait.forMethod(connection, 'query', "SELECT * FROM locations WHERE buildingID=\'" + rows[i].buildingID + "\';");
+			rows2 = wait.forMethod(connection, 'query', "SELECT * FROM location WHERE buildingID=\'" + rows[i].buildingID + "\';");
 		
 		for(var j=0;j<rows2.length;j++)
 		{

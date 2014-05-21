@@ -1,0 +1,6 @@
+.update-btn .friends-btn .schedule-btn .logout-btn {
+    display: block !important;
+    height: 50px !important;
+    width: 100% !important;
+    background-position: center  !important; 
+}
