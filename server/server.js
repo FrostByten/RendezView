@@ -568,7 +568,6 @@ function getRooms(response)
 	
 	console.log("JSON Object for Rooms: " + JSON.stringify(JSONrooms));
 	response.writeHead(200, {"Content-Type": "application/json"});
-	response.end(JSON.stringify(JSONrooms));
 }
 
 function SQLError(err)
