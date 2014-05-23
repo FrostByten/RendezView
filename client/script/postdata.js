@@ -12,7 +12,8 @@ $(document).ready(onReady());
 
 function updateRooms(value)
 {
-	var list = [];
+	var list = [],
+        name = "";
 	
 	$(".room").empty();
 	
@@ -24,12 +25,12 @@ function updateRooms(value)
 			{
 				list.push('<option value=\"' + locations[i].rooms[j].locationID + '\" id=\"' + locations[i].rooms[j].locationID + '\">' + locations[i].rooms[j].roomID + '</option>');
 			}
+            name = locations[i].rooms[0].locationID;
 		}
 	}
 	
 	$(".room").append(list.join(''));
-	$(".room").trigger("chosen:updated");
-	$(".room").val($(".room option:first").val());
+	$(".room").val(name).change();
 }
 
 function updateLists()
@@ -37,6 +38,17 @@ function updateLists()
 	$.getJSON("/" + ipstring + "/getajaxrooms?", function(data)
     {
         updateLocationLists(JSON.stringify(data));
+    });
+}
+
+function updateScheduleList()
+{
+    console.log("Updating schedule list...");
+	$.getJSON("/" + ipstring + "/" + window.name + "/showschedule?", function(data)
+    {
+        console.log("Retrieved JSON Data");
+        console.log(JSON.stringify(data));
+        gotoSchedule(JSON.stringify(data));
     });
 }
 
@@ -57,6 +69,8 @@ function updateLocationLists(data)
 	$(".building").append(list.join(''));
 	$(".building").trigger("chosen:updated");
 	$(".building").val($(".building option:first").val());
+    $(".building").val(locations[0].name).change();
+    updateRooms(locations[0].name);
 }
 
 function onReady()
@@ -191,21 +205,70 @@ function backToFriends()
 	window.location.replace("../../../../../index.html#friendsPage");
 }
 
-function updateScheduleList(JSONtext)
+function updateScheduleItems(JSONtext)
 {
-	var JSONschedule = JSON.parse(JSONtext);//[{"Day":"Wednesday","RoomID":"1850","BuildingID":"SW5","FromTime":"10:30 AM","ToTime":"1:30 PM"},{"Day":"Tuesday","RoomID":"1550","BuildingID":"NE1","FromTime":"8:00 AM","ToTime":"4:20 PM"},{"Day":"Saturday","RoomID":"Onnn","BuildingID":"Ononon","FromTime":"Break","ToTime":"Of Dawn"}],
-		list = [];
+    console.log("aaaaaaasfafs");
+    console.log(JSONtext);
+	var JSONschedule = JSON.parse(JSONtext);
+	var list = [];
 	
-	$(".schedulelist").empty();
+	$("#scheduleList").empty();
 	
 	for(var i=0;i<JSONschedule.length;i++)
 	{
 		var schedule = JSONschedule[i];
-		list.push('<li><a href=\"">' + schedule.Day + ' ' + schedule.FromTime + '-' + schedule.ToTime + '<br />' + schedule.BuildingID + ' ' + schedule.RoomID + '</a><a href="javascript:scheduleSettingsMenu(\'' + schedule.day + '\', \'' + schedule.FromTime + '\');"></a></li>');
+        
+        var newFromTime = schedule.FromTime;
+        newFromTime = newFromTime.substring(1, newFromTime.length - 4);
+        var useFromTime = newFromTime + ":00";
+        newFromTime = convertTime(newFromTime);
+        
+        console.log("From time: " + useFromTime);
+        
+        var newToTime = schedule.ToTime;
+        newToTime = newToTime.substring(1, newToTime.length - 4);
+        newToTime = convertTime(newToTime);
+        
+        var newDay = schedule.Day;
+        newDay = newDay.substring(1, newDay.length - 1);
+        newDay = newDay.charAt(0).toUpperCase() + newDay.slice(1);
+        
+        var newBuildingID = schedule.BuildingID;
+        newBuildingID = newBuildingID.substring(1, newBuildingID.length - 1);
+        
+        var newRoomID = schedule.RoomID;
+        newRoomID = newRoomID.substring(1, newRoomID.length - 1);
+        
+		list.push('<li><a href=\"">' + newDay + ' ' + newFromTime + ' - ' + newToTime + '<br />' + newBuildingID + '&nbsp;&nbsp;&nbsp;' + newRoomID + '</a><a href="javascript:scheduleSettingsMenu(\'' + newDay + '\', \'' + useFromTime + '\');"></a></li>');
 	}
 	
-	$(".schedulelist").append(list.join(''));
-	$(".schedulelist").listview('refresh');
+	$("#scheduleList").append(list.join(''));
+	$("#scheduleList").listview('refresh');
+}
+
+function convertTime(time)
+{
+
+    var arr = time.split(":");
+    var toReturn = "";
+    if(arr[0] >= 12)
+    {
+        if(arr[0] == 12)
+        {
+            toReturn = 12 + ":" + arr[1] + " PM";
+        }
+        else
+        {
+            toReturn = (+arr[0] - 12) + ":" + arr[1] + " PM";
+        }
+    }
+    else
+    {
+        toReturn = arr[0] + ":" + arr[1] + " AM";
+    }
+    
+    return toReturn;
+
 }
 
 function scheduleSettingsMenu(day, fromtime)
@@ -218,13 +281,26 @@ function scheduleSettingsMenu(day, fromtime)
 
 function deleteSchedule()
 {
+    window.location.replace("../../../../../../" + window.name + "/" + selectedscheduleday + "/" + selectedscheduletime + "/deleteschedule?");
+}
 
+function addScheduleItem()
+{
+	window.location.replace("../../../../../../" + window.name + "/" + document.getElementById("every").value + "/" + document.getElementById("fromhour").value + "/" + document.getElementById("fromminute").value + "/" + document.getElementById("frompm").value + "/" + document.getElementById("tohour").value + "/" + document.getElementById("tominute").value + "/" + document.getElementById("topm").value + "/" + document.getElementById("building").value + "/" + document.getElementById("roomsch").value +  "/addschedule?");
 }
 
 function gotoFriends()
 {
     updateFriendsList();
     window.location.replace("#friendsPage");
+}
+
+function gotoSchedule(JSONtext)
+{
+    console.log("aaa");
+    window.location.replace("#schedulePage");
+    updateScheduleItems(JSONtext);
+    
 }
 
 function login(dervar)

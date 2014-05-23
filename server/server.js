@@ -143,6 +143,23 @@ function serve(request, response)
 		addFriend(list[1], list[2], response);
 		return;
 	}
+    if(pathname.search("showschedule?")!=-1)
+    {
+        showSchedule(list[2], response);
+        return;
+    }
+    if(pathname.search("addschedule?")!=-1)
+    {
+        console.log(pathname);
+        addScheduleItem(list[1], response, list[2], list[3], list[4], list[5], list[6], list[7], list[8], list[9], list[10]);
+        return;
+    }
+    if(pathname.search("deleteschedule?")!=-1)
+    {
+        console.log(pathname);
+        deleteScheduleItem(list[1], response, list[2], list[3]);
+        return;
+    }
 	if(pathname.search("getfriends?")!=-1)
 	{
         console.log("getting friendsenschlitzen");
@@ -310,6 +327,231 @@ function addFriend(current, toadd, response)
 		response.end();
 		return;
 	}
+}
+
+function showSchedule(userid, response)
+{
+    console.log("Here 1");
+    var JSONschedule = [];
+    wait.forMethod(connection, 'query', "use rendezview");
+
+    console.log("Getting shit for user " + userid);
+	var rows = wait.forMethod(connection, 'query', "SELECT * FROM schedule WHERE userid=\"" + userid + "\"" + " \
+    ORDER BY Case \
+            When day Like 'monday' Then 1 \
+            When day Like 'tuesday' Then 2 \
+            When day Like 'wednesday' Then 3 \
+            When day Like 'thursday' Then 4 \
+            When day Like 'friday' Then 5 \
+            When day Like 'saturday' Then 6 \
+            When day Like 'sunday' Then 7 \
+            Else 99 \
+            End Asc \
+    , day DESC, fromTime ASC");
+    
+    if(rows==null||rows==undefined||rows.length==0)
+	{
+		
+		response.writeHead(200, {"Content-Type": "text/html"});
+		response.write("<script>window.location.replace(\"javascript:doScheduleUpdate(\'" + JSON.stringify(JSONschedule) + "\')\");</script>");
+		response.end();
+		
+		return;
+	}
+    
+    //[{"Day":"Wednesday","RoomID":"1850","BuildingID":"SW5","FromTime":"10:30 AM","ToTime":"1:30 PM"}]
+    for(var i=0;i<rows.length;i++)
+	{
+        var row = rows[i];
+        
+		var day = row.day;
+        var locationID = row.locationID;
+        var room;
+        var building;
+        
+        var rows2 = wait.forMethod(connection, 'query', "SELECT * FROM location WHERE locationID=\"" + locationID + "\"");
+        room = rows2[0].roomID;
+        building = rows2[0].areaID + rows2[0].buildingNum;
+        
+        var fromTime = row.fromTime;
+        var toTime = row.toTime;
+			
+		JSONschedule.push({"Day":"\"" + day + "\"","RoomID":"\"" + room + "\"","BuildingID":"\"" + building + "\"","FromTime":"\"" + fromTime + "\"","ToTime":"\"" + toTime + "\""});
+	}
+    
+    console.log("Displaying JSON data to return: " + JSON.stringify(JSONschedule));
+	
+	response.writeHead(200, {"Content-Type": "application/json"});
+	response.end(JSON.stringify(JSONschedule));
+    
+}
+
+function addScheduleItem(userid, response, dayOfWeek, fromHour, fromMinute, fromPM, toHour, toMinute, toPM, building, room)
+{
+    
+	wait.forMethod(connection, 'query', "use rendezview");
+    var fromTime;
+    var toTime;
+    
+    if(fromPM == "pm")
+    {
+        fromTime = (+fromHour + 12) + ":" + fromMinute + ":00";
+    }
+    else
+    {
+        fromTime = fromHour + ":" + fromMinute + ":00";
+    }
+    
+    if(toPM == "pm")
+    {
+        toTime = (+toHour + 12) + ":" + toMinute + ":00";
+    }
+    else
+    {
+        toTime = toHour + ":" + toMinute + ":00";
+    }
+    
+    //Can't have a schedule item run into the next day
+    if(compareTimes(fromTime, toTime) == 1)
+    {
+        response.writeHead(200, {"Content-Type": "text/html"});
+		response.write("<script>window.location.replace(\'../../../../../../../../../../../../../../../../../#scheduleTimeErrorPage\');</script>");
+		response.end();
+        return;
+    }
+    
+	var rows = wait.forMethod(connection, 'query', "SELECT * FROM schedule WHERE userid=\"" + userid + "\"");
+    if(rows != null && rows != undefined && rows.length > 0)
+    {
+    
+        for(var i=0;i<rows.length;i++)
+        {
+            var conflict = compareSchedule(dayOfWeek, rows[i].day, fromTime, rows[i].fromTime, toTime, rows[i].toTime);
+            if(conflict == 1)
+            {
+                console.log("No conflict");
+            }
+            else
+            {
+                console.log("Conflict");
+                response.writeHead(200, {"Content-Type": "text/html"});
+                response.write("<script>window.location.replace(\'../../../../../../../../../../../../../../../../../#scheduleConflictPage\');</script>");
+                response.end();
+                return;
+            }
+        }
+        
+        connection.query("INSERT INTO schedule (userid, locationID, day, fromTime, toTime) VALUES (\'" + userid + "\', \'" + room + "\', \'" + dayOfWeek + "\', \'" + fromTime + "\', \'" + toTime + "\');", function(err, rows, fields)
+        {
+            if(err)
+                console.log(err);
+        });
+        response.writeHead(200, {"Content-Type": "text/html"});
+        response.write("<script>window.location.replace(\'../../../../../../../../../../../../../../../../../#scheduleItemCreated\');</script>");
+        response.end();
+    
+    }
+    
+}
+
+//Return 1 if there is no conflict, 2 if there is
+function compareSchedule(dayOne, dayTwo, fromTimeOne, fromTimeTwo, toTimeOne, toTimeTwo)
+{
+    console.log("Comparing " + fromTimeOne + "-" + toTimeOne + " with " + fromTimeTwo + "-" + toTimeTwo);
+    
+    if(dayOne.toLowerCase() != dayTwo.toLowerCase())
+    {
+        console.log("Different days.   " + dayOne + "    and     " + dayTwo);
+        return 1;
+    }
+    //If fromTimeOne is earlier than toTimeTwo and later than fromTimeTwo
+    if(compareTimes(fromTimeOne, toTimeTwo) == 2 && compareTimes(fromTimeOne, fromTimeTwo) == 1)
+    {
+        console.log("CONFLICT: Schedule item one begins during schedule item two");
+        return 2;
+    }
+    //If toTimeOne is earlier than toTimeTwo and later than fromTimeTwo
+    else if(compareTimes(toTimeOne, toTimeTwo) == 2 && compareTimes(toTimeOne, fromTimeTwo) == 1)
+    {
+        console.log("CONFLICT: Schedule item one begins before schedule item two is done");
+        return 2;
+    }
+    
+    return 1;
+}
+
+//Return 1 if timeOne is later, or 2 if timeTwo is later, or 3 if they are equal
+function compareTimes(timeOne, timeTwo)
+{
+    var split = timeOne.split(":");
+    var split2 = timeTwo.split(":");
+    
+    console.log("Comparing hours: " + +split[0] + " and " + +split2[0]);
+    if(+split[0] > +split2[0])
+    {
+        console.log(timeOne + " is later than " + timeTwo + " by hours");
+        return 1;
+    }
+    else if(+split[0] < +split2[0])
+    {
+        console.log(timeOne + " is earlier than " + timeTwo + " by hours");
+        return 2;
+    }
+    else if(+split[1] > +split2[1])
+    {
+        return 1;
+    }
+    else if(+split[1] < +split2[1])
+    {
+        return 2;
+    }
+    else if(+split[3] > +split2[1])
+    {
+        return 1;
+    }
+    else if(+split[3] < +split2[1])
+    {
+        return 2;
+    }
+    
+    return 3;
+}
+
+function deleteScheduleItem(userid, response, day, fromtime)
+{
+    
+	wait.forMethod(connection, 'query', "use rendezview");
+    console.log("fromtime: \"" + fromtime);
+    var fromtime2 = reconvertTime(fromtime);
+    var dayToUse = day.toLowerCase();
+    
+    console.log("DELETE FROM schedule WHERE userid=\'" + userid + "\' AND day=\'" + dayToUse + "\' AND fromTime=\'" + fromtime2 + "\';");
+	wait.forMethod(connection, 'query', "DELETE FROM schedule WHERE userid=\'" + userid + "\' AND day=\'" + dayToUse + "\' AND fromTime=\'" + fromtime2 + "\';");
+    
+    console.log("here 2");
+    response.writeHead(200, {"Content-Type": "text/html"});
+    response.write("<script>window.location.replace(\'../../../../../../../../../../../../../../../../../#scheduleItemDeleted\');</script>");
+    response.end();
+    
+}
+
+function reconvertTime(time)
+{
+    
+    console.log("Reconverting \"" + time + "\"");
+    var timeSplit = time.split(":");
+    if(time.indexOf("PM") > -1)
+    {
+        if(timeSplit[0] != "12")
+        {
+            timeSplit[0] = +timeSplit[0] + 12;
+        }
+    }
+    
+    console.log("timesplit 1: \"" + timeSplit[1] + "\"");
+    var newTime = timeSplit[0] + ":" + timeSplit[1] + ":00";
+    console.log("Converted: \"" + newTime + "\"");
+    return newTime;
 }
 
 function getFriends(userid, response)
@@ -551,12 +793,12 @@ function getRooms(response)
     
 	wait.forMethod(connection, 'query', "use rendezview");
 
-	var rows = wait.forMethod(connection, 'query', "SELECT DISTINCT buildingID FROM location;");
+	var rows = wait.forMethod(connection, 'query', "SELECT DISTINCT areaID,buildingNum FROM location ORDER BY areaID ASC, buildingNum ASC;");
 
 	for(var i=0;i<rows.length;i++)
 	{
-		var building = {"name":rows[i].buildingID,"rooms":[]},
-			rows2 = wait.forMethod(connection, 'query', "SELECT * FROM location WHERE buildingID=\'" + rows[i].buildingID + "\';");
+		var building = {"name":rows[i].areaID + rows[i].buildingNum,"rooms":[]},
+			rows2 = wait.forMethod(connection, 'query', "SELECT * FROM location WHERE areaID=\'" + rows[i].areaID + "\' AND buildingNum=\'" + rows[i].buildingNum + "\';");
 		
 		for(var j=0;j<rows2.length;j++)
 		{
@@ -566,8 +808,9 @@ function getRooms(response)
 		JSONrooms.push(building);
 	}
 	
-	console.log("JSON Object for Rooms: " + JSON.stringify(JSONrooms));
+	//console.log("JSON Object for Rooms: " + JSON.stringify(JSONrooms));
 	response.writeHead(200, {"Content-Type": "application/json"});
+	response.end(JSON.stringify(JSONrooms));
 }
 
 function SQLError(err)

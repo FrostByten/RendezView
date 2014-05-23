@@ -127,7 +127,7 @@
 							<img src="images/update.png" width="53%">
 							<br />Update
 						</a>
-						<a href="#schedulePage" data-role="button" class="schedule-btn" data-transition="slide">
+						<a href="javascript:updateScheduleList();" data-role="button" class="schedule-btn" data-transition="slide">
 							<img src="images/schedule.png" width="53%">
 							<br />Schedule
 						</a>
@@ -181,7 +181,7 @@
 						</select>
 					</div>
 					<div class="ui-block-b">
-						<select name="room" id="room" class="room">
+						<select name="room" id="roomupd" class="room">
 							<option value="1">Room 1</option>
 							<option value="2">Room 2</option>
 							<option value="3">Room 3</option>
@@ -258,9 +258,9 @@
 		
 		<div id="addSchedulePage" data-role="page">
 			<div data-role="header" data-position="fixed">
-				<a href="#schedulePage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="back">Back</a>
+				<a href="javascript:updateScheduleList();" data-role="button" data-transition="pop" data-direction="reverse" data-icon="back">Back</a>
 				<h1>Add Scheduled Event</h1>
-				<a href="#schedulePage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="check">Confirm</a>
+				<a href="javascript:addScheduleItem();" data-role="button" data-transition="pop" data-direction="reverse" data-icon="check">Confirm</a>
 			</div>
 			<div data-role="content">
 				<div data-role="fieldcontain">
@@ -363,14 +363,14 @@
 				<label for="location"><strong>Location:</strong></label>
 				<div class="ui-grid-a" name="location" id="location">
 					<div class="ui-block-a">
-						<select name="building" id="building" class="building">
+						<select name="building" id="building" class="building"  onChange="updateRooms(this.value);">
 							<option value="1">Building 1</option>
 							<option value="2">Building 2</option>
 							<option value="3">Building 3</option>
 						</select>
 					</div>
 					<div class="ui-block-b">
-						<select name="room" id="room" class="room" onChange="updateRooms(this.value);">
+						<select name="room" id="roomsch" class="room">
 							<option value="1">Room 1</option>
 							<option value="2">Room 2</option>
 							<option value="3">Room 3</option>
@@ -408,7 +408,7 @@
 		<div id="settingSchedulePage" data-role="page">
 			<div data-role="content">
 				<a href="javascript:deleteSchedule();" data-role="button" data-theme="b">Delete</a>
-				<a href="#schedulePage" data-role="button">Cancel</a>
+				<a href="javascript:updateScheduleList();" data-role="button">Cancel</a>
 			</div>
 		</div>
 		
@@ -583,6 +583,42 @@
 				Your friendship to this user has been created.<br />
 				</strong><br />
 				<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+			</div>
+		</div>
+        
+        <div id="scheduleItemCreated" data-role="page">
+			<div data-role="content">
+				<strong><h1>Schedule Item Created</h1><br />
+				Successfully created a new schedule item.<br />
+				</strong><br />
+				<a href="javascript:updateScheduleList();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+			</div>
+		</div>
+        
+        <div id="scheduleItemDeleted" data-role="page">
+			<div data-role="content">
+				<strong><h1>Schedule Item Deleted</h1><br />
+				Successfully deleted the schedule item.<br />
+				</strong><br />
+				<a href="javascript:updateScheduleList();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+			</div>
+		</div>
+        
+        <div id="scheduleConflictPage" data-role="page">
+			<div data-role="content">
+				<strong><h1>Schedule Conflict</h1><br />
+				The day and time you have entered conflicts with another schedule item.<br />
+				</strong><br />
+				<a href="javascript:updateScheduleList();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+			</div>
+		</div>
+        
+        <div id="scheduleTimeErrorPage" data-role="page">
+			<div data-role="content">
+				<strong><h1>Schedule Error</h1><br />
+				Your To-time must be greater than your From-time.<br />
+				</strong><br />
+				<a href="javascript:updateScheduleList();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
 			</div>
 		</div>
 
