@@ -320,7 +320,6 @@ function setCurrentLocation()
 	window.location.replace("../../../../../../" + window.name + "/" + theBuild + "/" + theRoom + "/" + document.getElementById("updHour").value + "/" + document.getElementById("updMinute").value + "/" + document.getElementById("updPM").value + "/setlocation?");
 }
 
-
 function gotoFriends()
 {
     updateFriendsList();
@@ -331,14 +330,12 @@ function gotoSchedule(JSONtext)
 {
     window.location.replace("#schedulePage");
     updateScheduleItems(JSONtext);
-    
 }
 
 function gotoCurrentLocation(JSONtext)
 {
     window.location.replace("#updatePage");
     updateCurrentLocationItem(JSONtext);
-    
 }
 
 function login(dervar)
@@ -386,5 +383,43 @@ function denyFriend()
 
 function locateFriend(friendid)
 {
-	window.location.replace(friendid + "/locatefriend?");
+	$.getJSON("/" + ipstring + "/" + window.name + "/" + friendid + "/locatefriend?", function(data)
+    {
+        doLocateFriendUpdate(JSON.stringify(data));
+    });
+}
+
+function doLocateFriendUpdate(data)
+{
+	var JSONfriendlocation = JSON.parse(data),
+		list = [];
+	
+	//{"BuildingID":"SW5", "RoomID":"1850", "ToTime":"1:30PM","Schedule": [{"BuildingID":"NE1", "RoomID":"120", "ToTime":"3:25PM"}, {"BuildingID":"NE1", "RoomID":"120", "ToTime":"3:25PM"}]}
+	
+	$("#friendLoc").html("<strong>" + JSONfriendlocation.BuildingID + ' ' + JSONfriendlocation.RoomID + "</strong>");
+	$("#friendUntil").html("<strong>" + JSONfriendlocation.ToTime + "</strong>");
+	
+	$("#friendScheduleList").empty();
+	
+	for(var i=0;i<JSONfriendlocation.Schedule.length;i++)
+	{
+		var schedule = JSONfriendlocation.Schedule[i];
+        
+        var newToTime = schedule.ToTime;
+        newToTime = newToTime.substring(1, newToTime.length - 4);
+        newToTime = convertTime(newToTime);
+        
+        var newBuildingID = schedule.BuildingID;
+        newBuildingID = newBuildingID.substring(1, newBuildingID.length - 1);
+		
+		var newRoomID = schedule.RoomID;
+        newRoomID = newRoomID.substring(1, newRoomID.length - 1);
+        
+		list.push('<li><a href=\"">' + newBuildingID + ' ' + newRoomID + '<span style=\'float:right\'>Until: ' + newToTime + '</span>'  + '</a>/li>');
+	}
+	
+	$("#friendScheduleList").append(list.join(''));
+	$("#friendScheduleList").listview('refresh');
+	
+	window.location.replace("#friendLocationPage");
 }

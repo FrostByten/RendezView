@@ -549,7 +549,18 @@
 		<div id="friendLocationPage" data-role="page">
 			<div data-role="content">
 				<strong><h1>Friend Location</h1><br />
-				<h3><span id="friendlocation"></span></h3>
+				<div id="inset" name="inset" style="background-color:#4B4B4B;border-style:ridge;border-color:#6B6B6B;border-width:3px;padding:15px;">
+					<div class="ui-grid-a">
+						<div class="ui-block-a" style="padding:5px;">
+							<label>Current location: </label>
+							<span id="friendLoc"><strong></strong></span>
+						</div>
+						<div class="ui-block-b" style="padding:5px;">
+							<label>Until: </label>
+							<span id="friendUntil"><strong></strong></span>
+						</div>
+					</div>
+				</div>
 				</strong><br />
 				<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
 			</div>
@@ -619,6 +630,15 @@
 				Your To-time must be greater than your From-time.<br />
 				</strong><br />
 				<a href="javascript:updateScheduleList();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+				<div data-role="fieldcontain">
+					<form class="ui-filterable">
+						<input data-type="search" name="friendScheduleFilter" id="friendScheduleFilter" />
+					</form>
+				</div>
+				<ul id="friendScheduleList" class="friendSchedulelist" data-role="listview" data-filter="true" data-input="#friendScheduleFilter">
+					<li></li>
+				</ul>
+			</div>
 			</div>
 		</div>
 
