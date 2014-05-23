@@ -123,7 +123,7 @@
 				</div>
 				<fieldset class="ui-grid-a">
 					<div class="ui-block-a">
-						<a href="#updatePage" data-role="button" class="update-btn" data-transition="slide">
+						<a href="javascript:updateCurrentLocation();" data-role="button" class="update-btn" data-transition="slide">
 							<img src="images/update.png" width="53%">
 							<br />Update
 						</a>
@@ -155,33 +155,33 @@
 			<div data-role="header" data-position="fixed">
 				<a href="#mainPage" data-role="button" data-transition="slide" data-direction="reverse" data-icon="back">Back</a>
 				<h1>Update</h1>
-				<a href="#mainPage" data-role="button" data-transition="pop" data-direction="reverse" data-icon="check">Commit</a>
+				<a href="javascript:setCurrentLocation();" data-role="button" data-transition="pop" data-direction="reverse" data-icon="check">Commit</a>
 			</div>
 			<div data-role="content">
 				<div id="inset" name="inset" style="background-color:#4B4B4B;border-style:ridge;border-color:#6B6B6B;border-width:3px;padding:15px;">
 					<div class="ui-grid-a">
 						<div class="ui-block-a" style="padding:5px;">
 							<label>Current location: </label>
-							<strong>Lorum ipsum dolar sit amet</strong>
+							<span id="currentLoc"><strong>Lorum ipsum dolar sit amet</strong></span>
 						</div>
 						<div class="ui-block-b" style="padding:5px;">
 							<label>Until: </label>
-							<strong>Lorum ipsum dolar sit amet</strong>
+							<span id="currentUntil"><strong>Lorum ipsum dolar sit amet</strong></span>
 						</div>
 					</div>
 				</div>
 				<br />
-				<label for="location">New Location:</label>
+				<label for="location">Update Location:</label>
 				<div class="ui-grid-a">
 					<div class="ui-block-a">
-						<select name="building" id="building" class="building" onChange="updateRooms(this.value);">
+						<select name="building" id="updBuilding" class="building" onChange="updateRooms(this.value);">
 							<option value="huehue">Building 1</option>
 							<option value="jaja">Building 2</option>
 							<option value="brazilia">Building 3</option>
 						</select>
 					</div>
 					<div class="ui-block-b">
-						<select name="room" id="roomupd" class="room">
+						<select name="room" id="updRoom" class="room">
 							<option value="1">Room 1</option>
 							<option value="2">Room 2</option>
 							<option value="3">Room 3</option>
@@ -191,7 +191,7 @@
 				<label for="until">Until:</label>
 				<div class="ui-grid-b" name="until" id="until">
 					<div class="ui-block-a">
-						<select name="hour" id="hour">
+						<select name="hour" id="updHour">
 							<option value="1">01</option>
 							<option value="2">02</option>
 							<option value="3">03</option>
@@ -207,7 +207,7 @@
 						</select>
 					</div>
 					<div class="ui-block-b">
-						<select name="minute" id="minute">
+						<select name="minute" id="updMinute">
 							<option value="0">:00</option>
 							<option value="5">:05</option>
 							<option value="10">:10</option>
@@ -223,7 +223,7 @@
 						</select>
 					</div>
 					<div class="ui-block-c">
-						<select name="pm" id="pm" data-role="slider" data-mini="false">
+						<select name="pm" id="updPM" data-role="slider" data-mini="false">
 							<option value="am">AM</option>
 							<option value="pm">PM</option>
 						</select>

@@ -154,6 +154,12 @@ function serve(request, response)
         addScheduleItem(list[1], response, list[2], list[3], list[4], list[5], list[6], list[7], list[8], list[9], list[10]);
         return;
     }
+    if(pathname.search("setlocation?")!=-1)
+    {
+        console.log(pathname);
+        setCurrentLocation(list[1], response, list[2], list[3], list[4], list[5], list[6]);
+        return;
+    }
     if(pathname.search("deleteschedule?")!=-1)
     {
         console.log(pathname);
@@ -187,9 +193,15 @@ function serve(request, response)
 		getFriends(list[2], response);
 		return;
 	}
+    if(pathname.search("showcurrentlocation?")!=-1)
+	{
+		getCurrentLocation(list[2], response);
+		return;
+	}
     if(pathname.search("ketchups?")!=-1)
     {
-        console.log("VAT?");
+        console.log("No thank you.");
+        //giveKetchups();
         return;
     }
 	if(pathname.search("getajaxrooms?")!=-1)
@@ -386,6 +398,94 @@ function showSchedule(userid, response)
     
 }
 
+function getCurrentLocation(userid, response)
+{
+    var JSONloc = {"BuildingID":"", "ToTime":""};
+    wait.forMethod(connection, 'query', "use rendezview");
+
+    console.log("Getting current loc for user " + userid);
+	var rows = wait.forMethod(connection, 'query', "SELECT * FROM schedule WHERE userid=\"" + userid + "\"" + " AND day=\"" + getCurrentDay() +"\" AND NOW() BETWEEN fromTime AND toTime;");
+    var currentRows = wait.forMethod(connection, 'query', "SELECT * FROM currentLocation WHERE userid='" + userid + "' AND date=CURDATE();");
+    
+    if(currentRows != null && currentRows != undefined && currentRows.length > 0)
+    {
+    
+        var toTime = currentRows[0].currentToTime;
+        var currentDate = new Date(); 
+        var currentTime = currentDate.getHours() + ":" + currentDate.getMinutes() + ":00";
+        if(compareTimes(toTime, currentTime) == 1)
+        {
+            var currentRows2 = wait.forMethod(connection, 'query', "SELECT * FROM location WHERE locationID=\"" + currentRows[0].locationID + "\"");
+            JSONloc.BuildingID = currentRows2[0].areaID + currentRows2[0].buildingNum + " " + currentRows2[0].roomID;
+            JSONloc.ToTime = convertTime(toTime);
+        }
+        else
+        {
+            var rows2 = wait.forMethod(connection, 'query', "SELECT * FROM location WHERE locationID=\"" + rows[0].locationID + "\"");
+            JSONloc.BuildingID = rows2[0].areaID + rows2[0].buildingNum + " " + rows2[0].roomID;
+            JSONloc.ToTime = convertTime(rows[0].toTime);
+        }
+    
+    }
+    else if(rows==null||rows==undefined||rows.length==0)
+	{
+		
+		JSONloc.BuildingID = "Unknown";
+        JSONloc.ToTime = "Unknown";
+        
+	}
+    else
+    {
+        var rows2 = wait.forMethod(connection, 'query', "SELECT * FROM location WHERE locationID=\"" + rows[0].locationID + "\"");
+        JSONloc.BuildingID = rows2[0].areaID + rows2[0].buildingNum + " " + rows2[0].roomID;
+        JSONloc.ToTime = convertTime(rows[0].toTime);
+    }
+    console.log("Displaying JSON data to return: " + JSON.stringify(JSONloc));
+	
+	response.writeHead(200, {"Content-Type": "application/json"});
+	response.end(JSON.stringify(JSONloc));
+    //{"BuildingID":"","ToTime":""}
+
+}
+
+function getCurrentDay()
+{
+    var d = new Date();
+    var n = d.getDay();
+    if(n == 0)
+    {
+        return "sunday";
+    }
+    else if(n == 1)
+    {
+        return "monday";
+    }
+    else if(n == 2)
+    {
+        return "tuesday";
+    }
+    else if(n == 3)
+    {
+        return "wednesday";
+    }
+    else if(n == 4)
+    {
+        return "thursday";
+    }
+    else if(n == 5)
+    {
+        return "friday";
+    }
+    else if(n == 6)
+    {
+        return "saturday";
+    }
+    else
+    {
+        return "unknown day";
+    }
+}
+
 function addScheduleItem(userid, response, dayOfWeek, fromHour, fromMinute, fromPM, toHour, toMinute, toPM, building, room)
 {
     
@@ -451,6 +551,61 @@ function addScheduleItem(userid, response, dayOfWeek, fromHour, fromMinute, from
         response.end();
     
     }
+    
+}
+
+function setCurrentLocation(userid, response, building, room, hour, minute, pm)
+{
+    
+	wait.forMethod(connection, 'query', "use rendezview");
+    var toTime;
+    
+    var currentDate = new Date(); 
+    var currentTime = currentDate.getHours() + ":" + currentDate.getMinutes() + ":00";
+    
+    if(pm == "pm")
+    {
+        toTime = (+hour + 12) + ":" + minute + ":00";
+    }
+    else
+    {
+        toTime = hour + ":" + minute + ":00";
+    }
+    
+    if(compareTimes(toTime, currentTime) == 2)
+    {
+        //Can't set a time that is earlier than now
+        console.log("Set a time that is earlier than now.");
+        response.writeHead(200, {"Content-Type": "text/html"});
+		response.write("<script>window.location.replace(\'../../../../../../../../../../../../../../../../../#locationTimeErrorPage\');</script>");
+		response.end();
+        return;
+    }
+    
+    var buildingID = building.substring(2, building.length);
+    var areaID = building.substring(0, 2);
+    console.log("Selecting locationID of \"" + areaID + "\"  \"" + buildingID + "\"  " + room);
+    var locationRows = wait.forMethod(connection, 'query', "SELECT * FROM location WHERE areaID=\"" + areaID + "\" AND buildingNum=\"" + buildingID + "\" AND roomID=\"" + room + "\";");
+
+    //IF EXISTS (SELECT * FROM Table1 WHERE Column1='SomeValue')
+   
+    var exists = wait.forMethod(connection, 'query', "SELECT * FROM currentlocation WHERE userID=\"" + userid + "\"");
+    
+    if(exists == null || exists == undefined || exists.length == 0)
+    {
+        console.log("INSERT INTO currentlocation(userID,locationID,date,currentToTime) VALUES ('" + userid + "'," + locationRows[0].locationID + ",CURDATE()," + "'" + toTime + "')");
+        wait.forMethod(connection, 'query', "INSERT INTO currentlocation(userID,locationID,date,currentToTime) VALUES ('" + userid + "'," + locationRows[0].locationID + ",CURDATE()," + "'" + toTime + "')");
+    }
+    else
+    {
+        console.log("UPDATE currentLocation SET locationID=\"" + locationRows[0].locationID + "\", date=CURDATE(), currentToTime=\"" + toTime + "\" WHERE userid='" + userid + "'");
+        wait.forMethod(connection, 'query', "UPDATE currentLocation SET locationID=\"" + locationRows[0].locationID + "\", date=CURDATE(), currentToTime=\"" + toTime + "\" WHERE userid='" + userid + "'");
+    }
+    
+	//var rows = wait.forMethod(connection, 'query', "UPDATE currentLocation SET locationID=\"" + locationRows[0].locationID + "\", date=CURDATE(), currentToTime=\"" + toTime + "\" WHERE userid=\"" + userid + "\"");
+    response.writeHead(200, {"Content-Type": "text/html"});
+    response.write("<script>window.location.replace(\'../../../../../../../../../../../../../../../../../#locationUpdated\');</script>");
+    response.end();
     
 }
 
@@ -552,6 +707,31 @@ function reconvertTime(time)
     var newTime = timeSplit[0] + ":" + timeSplit[1] + ":00";
     console.log("Converted: \"" + newTime + "\"");
     return newTime;
+}
+
+function convertTime(time)
+{
+
+    var arr = time.split(":");
+    var toReturn = "";
+    if(arr[0] >= 12)
+    {
+        if(arr[0] == 12)
+        {
+            toReturn = 12 + ":" + arr[1] + " PM";
+        }
+        else
+        {
+            toReturn = (+arr[0] - 12) + ":" + arr[1] + " PM";
+        }
+    }
+    else
+    {
+        toReturn = arr[0] + ":" + arr[1] + " AM";
+    }
+    
+    return toReturn;
+
 }
 
 function getFriends(userid, response)

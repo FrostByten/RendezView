@@ -52,6 +52,17 @@ function updateScheduleList()
     });
 }
 
+function updateCurrentLocation()
+{
+    console.log("Updating current location...");
+	$.getJSON("/" + ipstring + "/" + window.name + "/showcurrentlocation?", function(data)
+    {
+        console.log("Retrieved JSON Data");
+        console.log(JSON.stringify(data));
+        gotoCurrentLocation(JSON.stringify(data));
+    });
+}
+
 function updateLocationLists(data)
 {
 	var list = [];
@@ -207,7 +218,6 @@ function backToFriends()
 
 function updateScheduleItems(JSONtext)
 {
-    console.log("aaaaaaasfafs");
     console.log(JSONtext);
 	var JSONschedule = JSON.parse(JSONtext);
 	var list = [];
@@ -244,6 +254,17 @@ function updateScheduleItems(JSONtext)
 	
 	$("#scheduleList").append(list.join(''));
 	$("#scheduleList").listview('refresh');
+}
+
+function updateCurrentLocationItem(JSONtext)
+{
+    console.log("Updating current location item");
+    console.log(JSONtext);
+	var JSONloc = JSON.parse(JSONtext);
+	
+	$("#currentLoc").html("<strong>" + JSONloc.BuildingID + "</strong>");
+	$("#currentUntil").html("<strong>" + JSONloc.ToTime + "</strong>");
+	
 }
 
 function convertTime(time)
@@ -289,6 +310,17 @@ function addScheduleItem()
 	window.location.replace("../../../../../../" + window.name + "/" + document.getElementById("every").value + "/" + document.getElementById("fromhour").value + "/" + document.getElementById("fromminute").value + "/" + document.getElementById("frompm").value + "/" + document.getElementById("tohour").value + "/" + document.getElementById("tominute").value + "/" + document.getElementById("topm").value + "/" + document.getElementById("building").value + "/" + document.getElementById("roomsch").value +  "/addschedule?");
 }
 
+function setCurrentLocation()
+{
+    console.log(document.getElementById("updBuilding").value);
+    var theRoom = $( "#updRoom option:selected" ).text();
+    var theBuild = $( "#updBuilding option:selected" ).text();
+    console.log($( "#updRoom option:selected" ).text());
+    console.log(document.getElementById("updHour").value);
+	window.location.replace("../../../../../../" + window.name + "/" + theBuild + "/" + theRoom + "/" + document.getElementById("updHour").value + "/" + document.getElementById("updMinute").value + "/" + document.getElementById("updPM").value + "/setlocation?");
+}
+
+
 function gotoFriends()
 {
     updateFriendsList();
@@ -297,9 +329,15 @@ function gotoFriends()
 
 function gotoSchedule(JSONtext)
 {
-    console.log("aaa");
     window.location.replace("#schedulePage");
     updateScheduleItems(JSONtext);
+    
+}
+
+function gotoCurrentLocation(JSONtext)
+{
+    window.location.replace("#updatePage");
+    updateCurrentLocationItem(JSONtext);
     
 }
 
