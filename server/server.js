@@ -454,9 +454,8 @@ function showSchedule(userid, response)
     if(rows==null||rows==undefined||rows.length==0)
 	{
 		
-		response.writeHead(200, {"Content-Type": "text/html"});
-		response.write("<script>window.location.replace(\"javascript:doScheduleUpdate(\'" + JSON.stringify(JSONschedule) + "\')\");</script>");
-		response.end();
+		response.writeHead(200, {"Content-Type": "application/json"});
+        response.end(JSON.stringify(JSONschedule));
 		
 		return;
 	}
@@ -639,17 +638,19 @@ function addScheduleItem(userid, response, dayOfWeek, fromHour, fromMinute, from
                 return;
             }
         }
-        
+
+    }
+    
+    console.log("INSERT INTO schedule (userid, locationID, day, fromTime, toTime) VALUES (\'" + userid + "\', \'" + room + "\', \'" + dayOfWeek + "\', \'" + fromTime + "\', \'" + toTime + "\');");
         connection.query("INSERT INTO schedule (userid, locationID, day, fromTime, toTime) VALUES (\'" + userid + "\', \'" + room + "\', \'" + dayOfWeek + "\', \'" + fromTime + "\', \'" + toTime + "\');", function(err, rows, fields)
         {
             if(err)
                 console.log(err);
         });
+        console.log("done query");
         response.writeHead(200, {"Content-Type": "text/html"});
         response.write("<script>window.location.replace(\'../../../../../../../../../../../../../../../../../#scheduleItemCreated\');</script>");
         response.end();
-    
-    }
     
 }
 
@@ -1008,7 +1009,7 @@ function tryRegister(pathname, response)
 	
 	connection.query("SELECT * FROM users WHERE userID=\"" + sid + "\"", function(err, rows, fields)
 	{
-		if(rows!=undefined)
+		if(rows != null && rows != undefined && rows.length > 0)
 		{
 			response.writeHead(200, {"Content-Type": "text/html"});
 			response.write("<script>window.location.replace(\"../../../../../../index.html#noReg\");</script>");
@@ -1058,7 +1059,7 @@ function sendMail(name, email)
 			from: "rendezview.server@gmail.com",
 			to: email + "@my.bcit.ca",
 			subject: "Welcome to RendezView",
-			text: "Thank you for joining RendezView!\n\nYour registration is complete, you may now verify your account by clicking the following link:\n\n  " + externalstring + "/" + name + "/validate?"
+			text: "Thank you for joining RendezView!\n\nYour registration is complete, you may now verify your account by clicking the following link:\n\n  http://" + externalstring + "/" + name + "/validate?"
 		}, function(error, response)
 		{
 			if(error)
