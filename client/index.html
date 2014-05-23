@@ -548,7 +548,7 @@
 		
 		<div id="friendLocationPage" data-role="page">
 			<div data-role="content">
-				<strong><h1>Friend Location</h1><br />
+				<strong><span id="friendTitle"><h1>Friend Location</h1></span><br />
 				<div id="inset" name="inset" style="background-color:#4B4B4B;border-style:ridge;border-color:#6B6B6B;border-width:3px;padding:15px;">
 					<div class="ui-grid-a">
 						<div class="ui-block-a" style="padding:5px;">
@@ -560,6 +560,14 @@
 							<span id="friendUntil"><strong></strong></span>
 						</div>
 					</div>
+                    <div data-role="fieldcontain">
+                        <form class="ui-filterable">
+                            <input data-type="search" name="friendScheduleFilter" id="friendScheduleFilter" />
+                        </form>
+                    </div>
+                    <ul id="friendScheduleList" class="friendSchedulelist" data-role="listview" data-filter="true" data-input="#friendScheduleFilter">
+                        <li></li>
+                    </ul>
 				</div>
 				</strong><br />
 				<a href="javascript:backToFriends();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
@@ -606,6 +614,15 @@
 			</div>
 		</div>
         
+        <div id="locationUpdated" data-role="page">
+			<div data-role="content">
+				<strong><h1>Location Updated</h1><br />
+				Your location has been updated.<br />
+				</strong><br />
+				<a href="#mainPage" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
+			</div>
+		</div>
+        
         <div id="scheduleItemDeleted" data-role="page">
 			<div data-role="content">
 				<strong><h1>Schedule Item Deleted</h1><br />
@@ -630,14 +647,6 @@
 				Your To-time must be greater than your From-time.<br />
 				</strong><br />
 				<a href="javascript:updateScheduleList();" data-role="button" data-transition="pop" data-direction="reverse">Back</a>
-				<div data-role="fieldcontain">
-					<form class="ui-filterable">
-						<input data-type="search" name="friendScheduleFilter" id="friendScheduleFilter" />
-					</form>
-				</div>
-				<ul id="friendScheduleList" class="friendSchedulelist" data-role="listview" data-filter="true" data-input="#friendScheduleFilter">
-					<li></li>
-				</ul>
 			</div>
 			</div>
 		</div>

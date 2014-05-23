@@ -391,19 +391,27 @@ function locateFriend(friendid)
 
 function doLocateFriendUpdate(data)
 {
+    console.log("here 1");
 	var JSONfriendlocation = JSON.parse(data),
 		list = [];
 	
+    console.log("Got JSON data:" + data);
 	//{"BuildingID":"SW5", "RoomID":"1850", "ToTime":"1:30PM","Schedule": [{"BuildingID":"NE1", "RoomID":"120", "ToTime":"3:25PM"}, {"BuildingID":"NE1", "RoomID":"120", "ToTime":"3:25PM"}]}
 	
+    $("#friendTitle").html("<h1>" + JSONfriendlocation.Name + "</h1>");
 	$("#friendLoc").html("<strong>" + JSONfriendlocation.BuildingID + ' ' + JSONfriendlocation.RoomID + "</strong>");
 	$("#friendUntil").html("<strong>" + JSONfriendlocation.ToTime + "</strong>");
 	
 	$("#friendScheduleList").empty();
 	
+    console.log("here 2");
 	for(var i=0;i<JSONfriendlocation.Schedule.length;i++)
 	{
 		var schedule = JSONfriendlocation.Schedule[i];
+        
+        var newFromTime = schedule.FromTime;
+        newFromTime = newFromTime.substring(1, newFromTime.length - 4);
+        newFromTime = convertTime(newFromTime);
         
         var newToTime = schedule.ToTime;
         newToTime = newToTime.substring(1, newToTime.length - 4);
@@ -415,11 +423,18 @@ function doLocateFriendUpdate(data)
 		var newRoomID = schedule.RoomID;
         newRoomID = newRoomID.substring(1, newRoomID.length - 1);
         
-		list.push('<li><a href=\"">' + newBuildingID + ' ' + newRoomID + '<span style=\'float:right\'>Until: ' + newToTime + '</span>'  + '</a>/li>');
+        var newDay = schedule.Day.substring(1, schedule.Day.length - 1);
+        
+        list.push('<li data-icon="false"><a href=\"">' + newDay + ' ' + newFromTime + ' - ' + newToTime + '<br />' + newBuildingID + '&nbsp;&nbsp;&nbsp;' + newRoomID + '</a></li>');
+
 	}
 	
+    console.log("here 3");
+    console.log("list: " + list);
+    window.location.replace("#friendLocationPage");
 	$("#friendScheduleList").append(list.join(''));
-	$("#friendScheduleList").listview('refresh');
+	$("#friendScheduleList").listview().listview('refresh');
 	
-	window.location.replace("#friendLocationPage");
+    console.log("here 4");
+	
 }

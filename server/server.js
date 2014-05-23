@@ -184,7 +184,7 @@ function serve(request, response)
 	}
 	if(pathname.search("locatefriend?")!=-1)
 	{
-		locateFriend(list[2], response);
+		locateFriend(list[3], response);
 		return;
 	}
 	if(pathname.search("getajaxfriends?")!=-1)
@@ -244,16 +244,106 @@ function makefriends(current, toadd, response)
 	response.end();
 }
 
-function locateFriend(friendid, response)//unfinished, locate via scheduling...........................................................................................................................................
+function locateFriend(friendid, response)
 {
-	var location = "huehuehue";
+    //{"BuildingID":"SW5", "RoomID":"1850", "ToTime":"1:30PM","Schedule": [{"BuildingID":"NE1", "RoomID":"120", "ToTime":"3:25PM"}, {"BuildingID":"NE1", "RoomID":"120", "ToTime":"3:25PM"}]}
+	var JSONloc = {"Name":"", "BuildingID":"", "RoomID":"", "ToTime":"","Schedule": []}
+    wait.forMethod(connection, 'query', "use rendezview");
 
-	connection.query("use rendezview");
-	//location logic here...
+    var nameRows = wait.forMethod(connection, 'query', "SELECT * FROM users WHERE userid=\"" + friendid + "\"");
+	var rows = wait.forMethod(connection, 'query', "SELECT * FROM schedule WHERE userid=\"" + friendid + "\"" + " AND day=\"" + getCurrentDay() +"\" AND NOW() BETWEEN fromTime AND toTime;");
+    var currentRows = wait.forMethod(connection, 'query', "SELECT * FROM currentLocation WHERE userid='" + friendid + "' AND date=CURDATE();");
+    
+    JSONloc.Name = unescape(nameRows[0].name);
+    
+    if(currentRows != null && currentRows != undefined && currentRows.length > 0)
+    {
+    
+        var toTime = currentRows[0].currentToTime;
+        var currentDate = new Date(); 
+        var currentTime = currentDate.getHours() + ":" + currentDate.getMinutes() + ":00";
+        if(compareTimes(toTime, currentTime) == 1)
+        {
+            var currentRows2 = wait.forMethod(connection, 'query', "SELECT * FROM location WHERE locationID=\"" + currentRows[0].locationID + "\"");
+            JSONloc.BuildingID = currentRows2[0].areaID + currentRows2[0].buildingNum;
+            JSONloc.RoomID = currentRows2[0].roomID;
+            JSONloc.ToTime = convertTime(toTime);
+        }
+        else
+        {
+            if(rows != null && rows != undefined && rows.length > 0)
+            {
+                var rows2 = wait.forMethod(connection, 'query', "SELECT * FROM location WHERE locationID=\"" + rows[0].locationID + "\"");
+                JSONloc.BuildingID = rows2[0].areaID + rows2[0].buildingNum;
+                JSONloc.RoomID = rows2[0].roomID;
+                JSONloc.ToTime = convertTime(rows[0].toTime);
+            }
+            else
+            {
+                JSONloc.BuildingID = "Unknown";
+                JSONloc.ToTime = "Unknown";
+            }
+        }
+        
+        
+    
+    }
+    else if(rows==null||rows==undefined||rows.length==0)
+	{
+		
+		JSONloc.BuildingID = "Unknown";
+        JSONloc.ToTime = "Unknown";
+        
+	}
+    else
+    {
+        var rows2 = wait.forMethod(connection, 'query', "SELECT * FROM location WHERE locationID=\"" + rows[0].locationID + "\"");
+        JSONloc.BuildingID = rows2[0].areaID + rows2[0].buildingNum;
+        JSONloc.RoomID = rows2[0].roomID;
+        JSONloc.ToTime = convertTime(rows[0].toTime);
+    }
+    
+    var schedRows = wait.forMethod(connection, 'query', "SELECT * FROM schedule WHERE userid=\"" + friendid + "\"" + " \
+    ORDER BY Case \
+            When day Like 'monday' Then 1 \
+            When day Like 'tuesday' Then 2 \
+            When day Like 'wednesday' Then 3 \
+            When day Like 'thursday' Then 4 \
+            When day Like 'friday' Then 5 \
+            When day Like 'saturday' Then 6 \
+            When day Like 'sunday' Then 7 \
+            Else 99 \
+            End Asc \
+    , day DESC, fromTime ASC");
+    if(schedRows != null && schedRows != undefined && schedRows.length != 0)
+    {
+        for(var i=0;i<schedRows.length;i++)
+        {
+            var schedrow = schedRows[i];
+            
+            var day = schedrow.day.charAt(0).toUpperCase() + schedrow.day.slice(1);
+            var locationID = schedrow.locationID;
+            var room;
+            var building;
+            
+            var rows2 = wait.forMethod(connection, 'query', "SELECT * FROM location WHERE locationID=\"" + locationID + "\"");
+            room = rows2[0].roomID;
+            building = rows2[0].areaID + rows2[0].buildingNum;
+            
+            var fromTime = convertTime(schedrow.fromTime);
+            var toTime = convertTime(schedrow.toTime);
+
+            JSONloc.Schedule.push({"BuildingID":"\"" + building + "\"","RoomID":"\"" + room + "\"","Day":"\"" + day + "\"","FromTime":"\"" + fromTime + "\"","ToTime":"\"" + toTime + "\""});
+        }
+    }
+
+    
+    
+    
+    console.log("Displaying JSON data to return: " + JSON.stringify(JSONloc));
 	
-	response.writeHead(200, {"Content-Type": "text/html"});
-	response.write("<script>friendlocation=\'" + location + "\'; showFriendLocation();</script>");
-	response.end();
+	response.writeHead(200, {"Content-Type": "application/json"});
+	response.end(JSON.stringify(JSONloc));
 }
 
 function confirmFriend(current, toadd, response)
@@ -421,9 +511,18 @@ function getCurrentLocation(userid, response)
         }
         else
         {
-            var rows2 = wait.forMethod(connection, 'query', "SELECT * FROM location WHERE locationID=\"" + rows[0].locationID + "\"");
-            JSONloc.BuildingID = rows2[0].areaID + rows2[0].buildingNum + " " + rows2[0].roomID;
-            JSONloc.ToTime = convertTime(rows[0].toTime);
+            if(rows != null && rows != undefined && rows.length > 0)
+            {
+                var rows2 = wait.forMethod(connection, 'query', "SELECT * FROM location WHERE locationID=\"" + rows[0].locationID + "\"");
+                JSONloc.BuildingID = rows2[0].areaID + rows2[0].buildingNum + " " + rows2[0].roomID;
+                JSONloc.ToTime = convertTime(rows[0].toTime);
+            }
+            else
+            {
+                JSONloc.BuildingID = "Unknown";
+                JSONloc.ToTime = "Unknown";
+            }
+            
         }
     
     }
